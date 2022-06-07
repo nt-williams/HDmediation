@@ -1,11 +1,15 @@
 e <- function(data, npsem, folds, learners) {
-    e <- matrix(nrow = nrow(data), ncol = 1)
+    emat <- matrix(nrow = nrow(data), ncol = 2)
+    colnames(emat) <- c("e(0|m,w)", "e(1|m,w)")
+
     for (v in seq_along(folds)) {
         train <- origami::training(data, folds[[v]])
         valid <- origami::validation(data, folds[[v]])
+        valid[[npsem$S]] <- 0
 
-        e[folds[[v]]$validation_set, 1] <-
-            crossfit(train, list(valid), npsem$A, c(npsem$M, npsem$W), "binomial", learners)[[1]]
+        preds <- crossfit(train, list(valid), npsem$A, c(npsem$M, npsem$W, npsem$S), "binomial", learners)[[1]]
+        emat[folds[[v]]$validation_set, "e(0|m,w)"] <- 1 - preds
+        emat[folds[[v]]$validation_set, "e(1|m,w)"] <- preds
     }
-    e
+    emat
 }

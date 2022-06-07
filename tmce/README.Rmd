@@ -1,0 +1,32 @@
+---
+title: "tmce"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<!-- badges: start -->
+
+<!-- badges: end -->
+
+-   [x] $e(a|m,w)$
+
+-   [x] $g(a|w)$
+
+-   [x] $h_Z(z,m,w)$
+
+-   [x] $h_M(z,m,w)$
+
+-   [x] $b(a,Z,M,W)$
+
+-   [x] $u(z,w)$
+
+-   [x] $\bar u(w)$
+
+-   [x] $v(m,w)$
+
+-   [x] $\bar v(w)$
+
+-   [x] $c(a,z,m,w)$
