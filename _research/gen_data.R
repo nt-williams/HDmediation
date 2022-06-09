@@ -13,22 +13,6 @@ gen_data <- function(n = 1e4) {
     m <- rbinom(n, 1, plogis(-log(2) + log(4) * z - log(1.4) * w1 + log(1.4) * site))
     y <- rbinom(n, 1, plogis(-log(5) + log(8) * z + log(4) * m - log(1.2) * w1 + log(1.2) * w1 * z))
     
-    # out <- list(
-    #     pop = data.frame(
-    #         W0 = w0,
-    #         W1 = w1,
-    #         A = a,
-    #         Z = z,
-    #         M = m,
-    #         Y = y,
-    #         S = site,
-    #         psel = psel,
-    #         probsel = probsel
-    #     )
-    # )
-    # out$obs <- out$pop[out$pop$psel == 1, ]
-    # out
-    
     data.frame(
         W0 = w0,
         W1 = w1,
@@ -36,8 +20,6 @@ gen_data <- function(n = 1e4) {
         Z = z,
         M = m,
         Y = y,
-        S = site,
-        psel = psel,
-        probsel = probsel
+        S = site
     )
 }
