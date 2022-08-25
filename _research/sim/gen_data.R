@@ -2,8 +2,8 @@ gen_data <- function(n = 1e4) {
     w0 <- rbinom(n, 1, .5)
     w1 <- rbinom(n, 1, .4 + (.2 * w0))
     
-    probsel <- plogis(-1 + log(4) * w1 + log(4) * w0)
-    psel <- rbinom(n, 1, probsel)
+    # probsel <- plogis(-1 + log(4) * w1 + log(4) * w0)
+    # psel <- rbinom(n, 1, probsel)
     
     probsite <- plogis(log(1.2) * w1 + log(1.2) * w0 + log(1.2) * w0 * w1)
     site <- rbinom(n, 1, probsite)

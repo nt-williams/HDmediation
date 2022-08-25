@@ -18,7 +18,7 @@ pm <- function(m, z, a, w, s) {
 }
 
 pmaw <- function(m, a, w, s) {
-    pm(m, 1, a, w, s) * pz(1, a, w, s) + pm(m, 0, a, w, s )* pz(0, a, w, s)
+    pm(m, 1, a, w, s) * pz(1, a, w, s) + pm(m, 0, a, w, s ) * pz(0, a, w, s)
 }
 
 pmw <- function(m, w, s) {
@@ -65,7 +65,7 @@ intu <- function(w, aprime, astar) {
 }
 
 intv <- function(m, w, aprime) {
-    my(m, 1, aprime, w) * pz(1, aprime, w, 0)+
+    my(m, 1, aprime, w) * pz(1, aprime, w, 0) +
         my(m, 0, aprime, w) * pz(0, aprime, w, 0)
 }
 
@@ -95,11 +95,36 @@ compute_eif <- function(dat, aprime, astar) {
     eifyt <- (s == 1) / mean(1 - s) * (a == aprime) / g(aprime)  * h * (y - my(m, z, aprime, w))
     eifut <- (s == 0) / mean(1 - s) * (a == aprime) / g(aprime) * (u(z, w, aprime, astar) - intu(w, aprime, astar))
     eifvt <- (s == 0) / mean(1 - s) * (a == astar) / g(astar) * (intv(m, w, aprime) - v)
-    eifyt + eifut + eifvt + (s == 0) / mean(1 - s) * v
+    
+    list(theta = mean(v[s == 0]), 
+         eif = eifyt + eifut + eifvt + (s == 0) / mean(1 - s) * (v - mean(v[s == 0])))
 }
 
-truth_mediation <- function(N) {
-    dat <- gendata(N)
+compute_eif2 <- function(dat, aprime, astar) {
+    a <- dat$A
+    z <- dat$Z
+    m <- dat$M
+    y <- dat$Y
+    s <- dat$S
+    w <- dat[, c("W0", "W1")]
+    
+    v <- intv(1, w, aprime) * pmaw(1, astar, w, 0) + intv(0, w, aprime) * pmaw(0, astar, w, 0)
+    h <- pmaw(m, astar, w, 0) / pm(m, z, aprime, w, 0) * (1 - b(aprime, z, m, w)) / b(aprime, z, m, w)
+    
+    eifyt <- (s == 1) / mean(1 - s) * (a == aprime) / g(aprime)  * h * (y - my(m, z, aprime, w))
+    eifut <- (s == 0) / mean(1 - s) * (a == aprime) / g(aprime) * (u(z, w, aprime, astar) - intu(w, aprime, astar))
+    eifvt <- (s == 0) / mean(1 - s) * (a == astar) / g(astar) * (intv(m, w, aprime) - v)
+    eifwt <- (s == 0) / mean(1 - s) * v
+    list(
+        y = eifyt,
+        z = eifut, 
+        m = eifvt, 
+        w = eifwt
+    )
+}
+
+truth_mediation <- function(dat) {
+    # dat <- gendata(N)
 
     # weights <- with(dat, mean(1 - S) / (mean((1 - S) / psel) * psel))
     weights <- 1
@@ -110,18 +135,18 @@ truth_mediation <- function(N) {
     eif00 <- compute_eif(dat, 0, 0)
 
     # compute parameter estimate and efficiency bound
-    indirect <- mean(eif11 - eif10)
-    direct   <- mean(eif10 - eif00)
+    indirect <- (eif11$theta - eif10$theta) + (mean(eif11$eif) - mean(eif10$eif))
+    direct   <- (eif10$theta - eif00$theta) + (mean(eif10$eif) - mean(eif00$eif))
 
-    eif_indirect <- weights * (eif11 - eif10 - (dat$S == 0) / mean(1 - dat$S) * indirect)
-    eif_direct   <- weights * (eif10 - eif00 - (dat$S == 0) / mean(1 - dat$S) * direct)
+    eif_indirect <- weights * (eif11$eif - eif10$eif)
+    eif_direct   <- weights * (eif10$eif - eif00$eif)
 
     var_indirect <- var(eif_indirect)
     var_direct <- var(eif_direct)
 
     data.frame(
         parameter = c("eif11", "eif10", "eif00", "indirect", "direct"),
-        truth = c(mean(eif11), mean(eif10), mean(eif00), indirect, direct),
-        eff_bound = c(var(eif11), var(eif10), var(eif00), var_indirect, var_direct)
+        truth = c(eif11$theta, eif10$theta, eif00$theta, indirect, direct),
+        eff_bound = c(var(eif11$eif), var(eif10$eif), var(eif00$eif), var_indirect, var_direct)
     )
 }
