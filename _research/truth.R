@@ -114,7 +114,7 @@ compute_eif2 <- function(dat, aprime, astar) {
     eifyt <- (s == 1) / mean(1 - s) * (a == aprime) / g(aprime)  * h * (y - my(m, z, aprime, w))
     eifut <- (s == 0) / mean(1 - s) * (a == aprime) / g(aprime) * (u(z, w, aprime, astar) - intu(w, aprime, astar))
     eifvt <- (s == 0) / mean(1 - s) * (a == astar) / g(astar) * (intv(m, w, aprime) - v)
-    eifwt <- (s == 0) / mean(1 - s) * v
+    eifwt <- (s == 0) / mean(1 - s) * (v - mean(v[s == 0]))
     list(
         y = eifyt,
         z = eifut, 

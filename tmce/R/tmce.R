@@ -11,7 +11,7 @@ tmce <- function(data, A, S, W, Z, M, Y, family, folds = 1) {
     bb <- b(data, npsem, "binomial", folds)
     t <- 1 - mean(data[[npsem$S]])
 
-    thetas <- eifs <- list()
+    thetas <- eifs <- eif_comps <- list()
     for (param in list(c(1, 1), c(1, 0), c(0, 0))) {
         aprime <- param[1]
         astar <- param[2]
@@ -46,36 +46,30 @@ tmce <- function(data, A, S, W, Z, M, Y, family, folds = 1) {
             (t * gg[, gl("g({astar}|w)")]) *
             (vv[, 1] - vvbar[, 1])
         
-        # eif <- eify + eifz + eifm + (1 - S) / t * (vvbar[, 1] - mean(vvbar[, 1])) + mean(vvbar[, 1])
-        # 
-        # theta <- mean(eif)
-        # eif <- eif - (1 - S) / t * theta
-        
         eifw <- (S == 0) / t * (vvbar[, 1] - mean(vvbar[S == 0, 1]))
-        # # D_PW <- (data[[npsem$S]] == 0) / t * (vvbar[, 1] - mean(vvbar[, 1]))
-        # 
+        
         theta <- mean(eify + eifz + eifm + eifw) + mean(vvbar[S == 0, 1])
-        # # theta <- mean(D_PY + D_PZ + D_PM + D_PW) + mean(vvbar[, 1])
         eif <- eify + eifz + eifm + eifw
+        eif_comp <- list(y = eify, 
+                         z = eifz, 
+                         m = eifm, 
+                         w = eifw)
         
         thetas <- c(thetas, list(theta))
         eifs <- c(eifs, list(eif))
-        # components <- list(y = D_PY, 
-        #      z = D_PZ, 
-        #      m = D_PM, 
-        #      w = (data[[npsem$S]] == 0) / t * (vvbar[, 1] - mean(vvbar[(data[[npsem$S]] == 0), 1])))
-        # 
-        # eifs <- c(eifs, list(components))
+        eif_comps <- c(eif_comps, list(eif_comp))
     }
 
     names(eifs) <- c("11", "10", "00")
     names(thetas) <- c("11", "10", "00")
+    names(eif_comps) <- c("11", "10", "00")
     
     ans <- list(indirect = thetas$`11` - thetas$`10`, 
                 direct = thetas$`10` - thetas$`00`)
     
     ans$var_indirect <- var(eifs$`11` - eifs$`10`)
     ans$var_direct <- var(eifs$`10` - eifs$`00`)
+    ans$eif_components <- eif_comps
 
     # ans <- list(
     #     indirect = mean(eifs$`11` - eifs$`10`),

@@ -27,6 +27,7 @@ regress <- function(train, y, x, id, type) { #, learners) {
 
 predictt <- function(fit, newX) {
     predict.glmnet3(fit, newX)
+    # predict.sal(fit, newX)
     # predict(fit, data[, fit$varNames])$pred[, 1]
     # mat <- predict(fit, newX, type = "response")
     # apply(mat, 2, mean)

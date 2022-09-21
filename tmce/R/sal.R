@@ -42,7 +42,7 @@ sal <- function(X, y, family = c("gaussian", "binomial"), id = NULL, ratio = 0.3
         }
 
         lasso <- try(glmnet::glmnet(H, y, lambda = params$lambda, family = match.arg(family)))
-        if (inherits(lasso, "try-error")) browser()
+        # if (inherits(lasso, "try-error")) browser()
         R <- y - predict(lasso, newx = H, type = "response")
     }
     
