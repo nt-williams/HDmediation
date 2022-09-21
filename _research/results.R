@@ -1,6 +1,7 @@
 suppressPackageStartupMessages(library(tidyverse))
+library(kableExtra)
 
-res <- read_csv("_research/results.csv")
+res <- read_csv("_research/results_sl.csv")
 
 # local({
 #     source("_research/gen_data.R", local = TRUE)
@@ -32,4 +33,12 @@ res <- group_by(res, n) |>
 
 pivot_longer(res, !n, 
              names_to = c(".value", "effect"), 
-             names_pattern = "(.+)_(.+)")
+             names_pattern = "(.+)_(.+)") |> 
+    mutate(effect = str_to_title(effect)) |> 
+    kbl("latex", 
+        booktabs = TRUE, 
+        digits = 2, 
+        col.names = c("n", "Estimand", "$|Bias|$", "$\\sqrt{n} \\times |Bias|$", "95\\% CI Coverage"), 
+        escape = FALSE, 
+        align = c("l", "l", "c", "c", "c"),
+        linesep = "")

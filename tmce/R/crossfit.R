@@ -1,5 +1,5 @@
 crossfit <- function(train, valid, y, x, type = c("binomial", "gaussian"), 
-                     id = NULL, learners = c("SL.mean", "SL.glm", "SL.glm.interaction", "SL.xgboost", "SL.earth")) {
+                     id = NULL, learners = c("SL.mean", "SL.glm", "SL.glm.interaction", "SL.lightgbm", "SL.earth")) {
     fit <- regress(train, y, x, id, match.arg(type), learners = learners)
     lapply(valid, function(newX) predictt(fit, newX[, x]))
 }
