@@ -1,5 +1,5 @@
 ---
-title: "tmce"
+title: "HDmediation"
 output: github_document
 ---
 
@@ -11,22 +11,4 @@ knitr::opts_chunk$set(echo = TRUE)
 
 <!-- badges: end -->
 
--   [x] $e(a|m,w)$
-
--   [x] $g(a|w)$
-
--   [x] $h_Z(z,m,w)$
-
--   [x] $h_M(z,m,w)$
-
--   [x] $b(a,Z,M,W)$
-
--   [x] $u(z,w)$
-
--   [x] $\bar u(w)$
-
--   [x] $v(m,w)$
-
--   [x] $\bar v(w)$
-
--   [x] $c(a,z,m,w)$
+Efficient, doubly-robust--and possibly transported--estimation of interventional (in)direct effects with high-dimensional mediators and mediator-outcome confounders. 
