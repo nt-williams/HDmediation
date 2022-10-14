@@ -8,7 +8,7 @@ u <- function(data, npsem, bb, hm, aprime, folds, ...) {
         train <- origami::training(data, folds[[v]])
         valid <- origami::validation(data, folds[[v]])
         valid[[npsem$A]] <- aprime
-        valid[[npsem$S]] <- 0
+        try(valid[[npsem$S]] <- 0, silent = TRUE)
 
         u[folds[[v]]$validation_set, "u(z,w)"] <-
             crossfit(train, list(valid), "b(a',Z,M,W)hm(Z,M,W)",
@@ -27,7 +27,7 @@ ubar <- function(data, npsem, uu, aprime, folds, ...) {
         train <- origami::training(data, folds[[v]])
         valid <- origami::validation(data, folds[[v]])
         valid[[npsem$A]] <- aprime
-        valid[[npsem$S]] <- 0
+        try(valid[[npsem$S]] <- 0, silent = TRUE)
 
         ubar[folds[[v]]$validation_set, "ubar(w)"] <-
             crossfit(train, list(valid), "u(z,w)",

@@ -11,8 +11,8 @@ read_zip <- function(tar) {
     })
 }
 
-n <- 500
-res <- read_zip(glue("_research/data/res_{n}.zip"))
+n <- 10000
+res <- read_zip(glue("_research/data/res_sl_{n}.zip"))
 res <- bind_rows(res)
 
-write_csv(res, "_research/results.csv", append = file.exists("_research/results.csv"))
+write_csv(res, "_research/results_sl.csv", append = file.exists("_research/results_sl.csv"))

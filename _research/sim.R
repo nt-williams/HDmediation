@@ -1,4 +1,5 @@
 source("_research/gen_data.R")
+source("_research/SL.lightgbm.R")
 
 library(furrr)
 library(glue)
