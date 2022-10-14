@@ -5,7 +5,7 @@ g <- function(data, npsem, folds) {
     for (v in seq_along(folds)) {
         train <- origami::training(data, folds[[v]])
         valid <- origami::validation(data, folds[[v]])
-        valid[[npsem$S]] <- 0
+        try(valid[[npsem$S]] <- 0, silent = TRUE)
 
         preds <- crossfit(train, list(valid), npsem$A, c(npsem$W, npsem$S), "binomial")[[1]]
 

@@ -1,14 +1,11 @@
-tmce <- function(data, A, S, W, Z, M, Y, family, folds = 1) {
-    checkmate::assertDataFrame(data[, c(A, S, W, Z, M, Y)])
-    checkmate::assertNumber(folds, lower = 1, upper = nrow(data) - 1)
-
+transported <- function(data, A, S, W, Z, M, Y, family, folds = 1) {
     npsem <- Npsem$new(A = A, S = S, W = W, Z = Z, M = M, Y = Y)
     folds <- make_folds(data, folds)
 
     gg <- g(data, npsem, folds)
     ee <- e(data, npsem, folds)
     cc <- see(data, npsem, folds)
-    bb <- b(data, npsem, "binomial", folds)
+    bb <- b(data, npsem, family, folds)
     t <- 1 - mean(data[[npsem$S]])
 
     thetas <- eifs <- eif_comps <- list()
@@ -21,15 +18,13 @@ tmce <- function(data, A, S, W, Z, M, Y, family, folds = 1) {
         uu <- u(data, npsem, bb, hm, aprime, folds)
         uubar <- ubar(data, npsem, uu, aprime, folds)
         vv <- v(data, npsem, bb, hz, aprime, folds)
-        # vv <- true_v(data, aprime)
         vvbar <- vbar(data, npsem, vv, astar, folds)
-        # vvbar <- matrix(true_vbar(data, aprime, astar), ncol = 1)
 
         # EIF calculation
         S <- data[[npsem$S]]
         A <- data[[npsem$A]]
         Y <- data[[npsem$Y]]
-            
+
         eify <-
             ((S == 1) & (A == aprime)) /
             (t * gg[, gl("g({aprime}|w)")]) *
@@ -45,16 +40,16 @@ tmce <- function(data, A, S, W, Z, M, Y, family, folds = 1) {
             ((S == 0) & (A == astar)) /
             (t * gg[, gl("g({astar}|w)")]) *
             (vv[, 1] - vvbar[, 1])
-        
+
         eifw <- (S == 0) / t * (vvbar[, 1] - mean(vvbar[S == 0, 1]))
-        
+
         theta <- mean(eify + eifz + eifm + eifw) + mean(vvbar[S == 0, 1])
         eif <- eify + eifz + eifm + eifw
-        eif_comp <- list(y = eify, 
-                         z = eifz, 
-                         m = eifm, 
+        eif_comp <- list(y = eify,
+                         z = eifz,
+                         m = eifm,
                          w = eifw)
-        
+
         thetas <- c(thetas, list(theta))
         eifs <- c(eifs, list(eif))
         eif_comps <- c(eif_comps, list(eif_comp))
@@ -63,21 +58,12 @@ tmce <- function(data, A, S, W, Z, M, Y, family, folds = 1) {
     names(eifs) <- c("11", "10", "00")
     names(thetas) <- c("11", "10", "00")
     names(eif_comps) <- c("11", "10", "00")
-    
-    ans <- list(indirect = thetas$`11` - thetas$`10`, 
+
+    ans <- list(indirect = thetas$`11` - thetas$`10`,
                 direct = thetas$`10` - thetas$`00`)
-    
+
     ans$var_indirect <- var(eifs$`11` - eifs$`10`)
     ans$var_direct <- var(eifs$`10` - eifs$`00`)
-    ans$eif_components <- eif_comps
-
-    # ans <- list(
-    #     indirect = mean(eifs$`11` - eifs$`10`),
-    #     direct = mean(eifs$`10` - eifs$`00`)
-    # )
-    # 
-    # ans$var_indirect <- var(eifs$`11` - eifs$`10` - (data[[npsem$S]] == 0) / t * ans$indirect)
-    # ans$var_direct <- var(eifs$`10` - eifs$`00` - (data[[npsem$S]] == 0) / t * ans$direct)
-    
+    # ans$eif_components <- eif_comps
     ans
 }

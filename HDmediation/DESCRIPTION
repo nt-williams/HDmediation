@@ -1,0 +1,32 @@
+Package: HDmediation
+Type: Package
+Title: Interventional (In)Direct Effects
+Version: 0.1.0.5000
+Authors@R: 
+    c(person(given = "Nicholas",
+             family = "Williams",
+             role = c("aut", "cre", "cph"),
+             email = "ntw2117@cumc.columbia.edu", 
+             comment = c(ORCID = "0000-0002-1378-4831")),
+      person(given = "Kara", 
+             family = "Rudolph", 
+             email = "kr2854@cumc.columbia.edu",
+             role = c("aut", "cph")),
+      person(given = "Iván", 
+             family = "Díaz", 
+             email = "ivan.diaz@nyulangone.org",
+             role = c("aut", "cph"),
+             comment = c(ORCID = "0000-0001-9056-2047")))
+Maintainer: Nicholas Williams <ntw2117@cumc.columbia.edu>
+Description: Efficient, doubly-robust--and possibly transported--estimation of interventional 
+    (in)direct effects with high-dimensional mediators and mediator-outcome confounders. 
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    checkmate,
+    glue, 
+    origami, 
+    R6, 
+    SuperLearner
+RoxygenNote: 7.2.1

@@ -4,7 +4,7 @@ b <- function(data, npsem, family, folds, ...) {
     colnames(b) <- c("b(0,Z,M,W)", "b(1,Z,M,W)")
     for (v in seq_along(folds)) {
         train <- origami::training(data, folds[[v]])
-        train <- train[train[[npsem$S]] == 1, ]
+        try(train <- train[train[[npsem$S]] == 1, ], silent = TRUE)
         valid_1 <- valid_0 <- origami::validation(data, folds[[v]])
         valid_1[[npsem$A]] <- 1
         valid_0[[npsem$A]] <- 0

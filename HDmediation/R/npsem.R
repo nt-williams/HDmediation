@@ -7,13 +7,13 @@ Npsem <- R6::R6Class(
         Z = NULL,
         M = NULL,
         Y = NULL,
-        initialize = function(S, W, A, Z, M, Y) {
+        initialize = function(S = NULL, W, A, Z, M, Y) {
             checkmate::assertCharacter(A)
             checkmate::assertCharacter(W)
             checkmate::assertCharacter(Y)
             checkmate::assertCharacter(Z)
             checkmate::assertCharacter(M)
-            checkmate::assertCharacter(S)
+            checkmate::assertCharacter(S, null.ok = TRUE)
 
             self$S <- S
             self$W <- W
