@@ -13,7 +13,16 @@ mediation(
   Y,
   S = NULL,
   family = c("binomial", "gaussian"),
-  folds = 1
+  folds = 1,
+  learners_g = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+  learners_e = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+  learners_c = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+  learners_b = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+  learners_hz = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+  learners_u = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+  learners_ubar = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+  learners_v = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+  learners_vbar = c("SL.glm", "SL.glm.interaction", "SL.mean")
 )
 }
 \arguments{
@@ -46,6 +55,26 @@ Outcome variable type (i.e., "gaussian", "binomial").}
 
 \item{folds}{[\code{integer(1)}]\cr
 The number of folds to be used for cross-fitting.}
+
+\item{learners_g}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms for estimation
+of the exposure mechanism.}
+
+\item{learners_e}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms.}
+
+\item{learners_c}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms.}
+
+\item{learners_b}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms for estimation
+of the outcome mechanism.}
+
+\item{learners_hz}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms.}
+
+\item{learners_u}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms.}
+
+\item{learners_ubar}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms.}
+
+\item{learners_v}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms.}
+
+\item{learners_vbar}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms.}
 }
 \value{
 A list of the estimates

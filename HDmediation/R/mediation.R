@@ -24,6 +24,17 @@
 #'  Outcome variable type (i.e., "gaussian", "binomial").
 #' @param folds [\code{integer(1)}]\cr
 #'  The number of folds to be used for cross-fitting.
+#' @param learners_g [\code{character}]\cr A vector of \code{SuperLearner} algorithms for estimation
+#'  of the exposure mechanism.
+#' @param learners_e [\code{character}]\cr A vector of \code{SuperLearner} algorithms.
+#' @param learners_c [\code{character}]\cr A vector of \code{SuperLearner} algorithms.
+#' @param learners_b [\code{character}]\cr A vector of \code{SuperLearner} algorithms for estimation
+#'  of the outcome mechanism.
+#' @param learners_hz [\code{character}]\cr A vector of \code{SuperLearner} algorithms.
+#' @param learners_u [\code{character}]\cr A vector of \code{SuperLearner} algorithms.
+#' @param learners_ubar [\code{character}]\cr A vector of \code{SuperLearner} algorithms.
+#' @param learners_v [\code{character}]\cr A vector of \code{SuperLearner} algorithms.
+#' @param learners_vbar [\code{character}]\cr A vector of \code{SuperLearner} algorithms.
 #'
 #' @return A list of the estimates
 #' @export
@@ -52,16 +63,32 @@
 #' )
 #'
 #' mediation(tmp, "A", c("W0", "W1"), "Z", "M", "Y", "S", "binomial", 1)
-mediation <- function(data, A, W, Z, M, Y, S = NULL, family = c("binomial", "gaussian"), folds = 1) {
+mediation <- function(data, A, W, Z, M, Y, S = NULL,
+                      family = c("binomial", "gaussian"), folds = 1,
+                      learners_g = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+                      learners_e = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+                      learners_c = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+                      learners_b = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+                      learners_hz = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+                      learners_u = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+                      learners_ubar = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+                      learners_v = c("SL.glm", "SL.glm.interaction", "SL.mean"),
+                      learners_vbar = c("SL.glm", "SL.glm.interaction", "SL.mean")) {
     checkmate::assertDataFrame(data[, c(A, S, W, Z, M, Y)])
     checkmate::assertNumber(folds, lower = 1, upper = nrow(data) - 1)
 
     if (!is.null(S)) {
-        ans <- transported(data, A, S, W, Z, M, Y, family, folds)
+        ans <- transported(data, A, S, W, Z, M, Y, family, folds,
+                           learners_g, learners_e, learners_c, learners_b,
+                           learners_hz, learners_u, learners_ubar,
+                           learners_v, learners_vbar)
     }
 
     if (is.null(S)) {
-        ans <- not_transported(data, A, W, Z, M, Y, family, folds)
+        ans <- not_transported(data, A, W, Z, M, Y, family, folds,
+                               learners_g, learners_e, learners_b,
+                               learners_hz, learners_u, learners_ubar,
+                               learners_v, learners_vbar)
     }
 
     ans

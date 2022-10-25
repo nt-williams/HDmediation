@@ -27,6 +27,5 @@ Imports:
     checkmate,
     glue, 
     origami, 
-    R6, 
     SuperLearner
 RoxygenNote: 7.2.1

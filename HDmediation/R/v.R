@@ -1,4 +1,4 @@
-v <- function(data, npsem, bb, hz, aprime, folds, ...) {
+v <- function(data, npsem, bb, hz, aprime, folds, learners, ...) {
     v <- matrix(nrow = nrow(data), ncol = 1)
     colnames(v) <- "v(m,w)"
 
@@ -12,12 +12,13 @@ v <- function(data, npsem, bb, hz, aprime, folds, ...) {
 
         v[folds[[fold]]$validation_set, "v(m,w)"] <-
             crossfit(train, list(valid), "b(a',Z,M,W)hz(Z,M,W)",
-                     c(npsem$M, npsem$A, npsem$W, npsem$S), "gaussian")[[1]]
+                     c(npsem$M, npsem$A, npsem$W, npsem$S), "gaussian",
+                     learners = learners)[[1]]
     }
     v
 }
 
-vbar <- function(data, npsem, vv, astar, folds, ...) {
+vbar <- function(data, npsem, vv, astar, folds, learners, ...) {
     vbar <- matrix(nrow = nrow(data), ncol = 1)
     colnames(vbar) <- "vbar(w)"
 
@@ -31,7 +32,8 @@ vbar <- function(data, npsem, vv, astar, folds, ...) {
 
         vbar[folds[[v]]$validation_set, "vbar(w)"] <-
             crossfit(train, list(valid), "v(m,w)",
-                     c(npsem$A, npsem$W, npsem$S), "gaussian")[[1]]
+                     c(npsem$A, npsem$W, npsem$S), "gaussian",
+                     learners = learners)[[1]]
     }
     vbar
 }

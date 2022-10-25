@@ -18,7 +18,7 @@ pm <- function(m, z, a, w, s) {
 }
 
 pmaw <- function(m, a, w, s) {
-    pm(m, 1, a, w, s) * pz(1, a, w, s) + pm(m, 0, a, w, s ) * pz(0, a, w, s)
+    pm(m, 1, a, w, s) * pz(1, a, w, s) + pm(m, 0, a, w, s) * pz(0, a, w, s)
 }
 
 pmw <- function(m, w, s) {
