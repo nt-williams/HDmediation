@@ -81,6 +81,32 @@ gendata <- function(N) {
     data.frame(W0 = w0, W1 = w1, A = a, Z = z, M = m, Y = y, S = s)
 }
 
+truth <- function() {
+    w <- expand.grid(W0 = c(0, 1), 
+                     W1 = c(0, 1))
+    
+    prob_w <- vector("numeric", nrow(w))
+    for (i in 1:nrow(w)) {
+        w0 <- 0.5
+        p <- .4 + (.2 * w[i, "W0"])
+        w1 <- w[i, "W1"] * p + (1 - w[i, "W1"]) * (1 - p)
+        prob_w[i] <- w1 * w0
+    }
+    
+    aprime <- astar <- 1
+    v_11 <- intv(1, w, aprime) * pmaw(1, astar, w, 0) + intv(0, w, aprime) * pmaw(0, astar, w, 0)
+    
+    astar <- 0
+    v_10 <- intv(1, w, aprime) * pmaw(1, astar, w, 0) + intv(0, w, aprime) * pmaw(0, astar, w, 0)
+    
+    aprime <- 0
+    v_00 <- intv(1, w, aprime) * pmaw(1, astar, w, 0) + intv(0, w, aprime) * pmaw(0, astar, w, 0)
+    
+    c("indirect" = weighted.mean(v_11 - v_10, prob_w),
+      "direct" = weighted.mean(v_10 - v_00, prob_w))
+}
+
+
 compute_eif <- function(dat, aprime, astar) {
     a <- dat$A
     z <- dat$Z
