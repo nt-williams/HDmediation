@@ -65,6 +65,7 @@ not_transported <- function(data, A, W, Z, M, Y, family, folds = 1,
     names(thetas) <- c("11", "10", "00")
     # names(eif_comps) <- c("11", "10", "00")
 
+    browser()
     ans <- list(indirect = thetas$`11` - thetas$`10`,
                 direct = thetas$`10` - thetas$`00`)
 

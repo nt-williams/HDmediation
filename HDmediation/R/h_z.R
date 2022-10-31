@@ -25,11 +25,15 @@ h_z <- function(data, npsem, aprime, folds, learners, ...) {
 stack_data <- function(data, npsem) {
     delta <- data
 
-    vals_M <- unique(data[[npsem$M]])
-    delta[[npsem$M]] <- sample(x = vals_M,
-                               size = nrow(data),
-                               replace = TRUE,
-                               prob = rep(1 / length(vals_M), length(vals_M)))
+    vals_M <- unique(data[, npsem$M, drop = FALSE])
+    for (i in 1:nrow(data)) { 
+        delta[i, npsem$M] <- vals_M[sample.int(nrow(vals_M), 1), ]
+    }
+    
+    # delta[[npsem$M]] <- sample(x = vals_M,
+    #                            size = nrow(data),
+    #                            replace = TRUE,
+    #                            prob = rep(1 / length(vals_M), length(vals_M)))
 
     # # sampling from the empirical distribution P_n(m)
     # delta[[npsem$M]] <- sample(data[[npsem$M]], replace = TRUE)

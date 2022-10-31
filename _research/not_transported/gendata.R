@@ -110,6 +110,9 @@ truth <- function() {
         intv(0, 1, w, aprime) * pmaw(0, 1, astar, w) + 
         intv(0, 0, w, aprime) * pmaw(0, 0, astar, w)
     
-    c("indirect" = weighted.mean(v_11 - v_10, prob_w),
+    c("11" = weighted.mean(v_11, prob_w), 
+      "10" = weighted.mean(v_10, prob_w), 
+      "00" = weighted.mean(v_00, prob_w), 
+      "indirect" = weighted.mean(v_11 - v_10, prob_w),
       "direct" = weighted.mean(v_10 - v_00, prob_w))
 }
