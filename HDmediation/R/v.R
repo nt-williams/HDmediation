@@ -2,7 +2,7 @@ v <- function(data, npsem, bb, hz, aprime, folds, learners, ...) {
     v <- matrix(nrow = nrow(data), ncol = 1)
     colnames(v) <- "v(m,w)"
 
-    data[["b(a',Z,M,W)hz(Z,M,W)"]] <- bb[, gl("b({aprime},Z,M,W)")]*hz[, 1]
+    data[["b(a',Z,M,W)hz(Z,M,W)"]] <- bb[, gl("b({aprime},Z,M,W)")]*hz[, gl("h_z({aprime})")]
 
     for (fold in seq_along(folds)) {
         train <- origami::training(data, folds[[fold]])

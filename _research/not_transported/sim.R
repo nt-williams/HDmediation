@@ -1,28 +1,29 @@
-library(HDmediation)
-library(glue)
-suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages({
+    library(HDmediation)
+    library(glue)
+    library(tidyverse)
+})
 
 source("_research/not_transported/gendata.R")
 source("_research/SL.lightgbm.R")
-# source("_research/SL.bart.R")
+source("_research/SL.glmnet3.R")
 
 id <- Sys.getenv("SGE_TASK_ID")
 if (id == "undefined" || id == "") id <- 1
 
 res <- map_dfr(c(500, 1000, 5000, 1e4), function(n) {
     dat <- gendata(n)
+    
+    # folds <- case_when(n <= 1000 ~ 10,
+    #                    n == 5000 ~ 4,
+    #                    TRUE ~ 2)
+    folds <- 1
+    
     mediation(dat, "A", "W1", 
               c("Z1", "Z2"), 
               c("M1", "M2"), "Y", 
               family = "binomial", 
-              folds = 1, 
-              learners_g = c("SL.mean"),
-              learners_e = c("SL.glm", "SL.glm.interaction", "SL.lightgbm"),
-              learners_c = c("SL.glm", "SL.glm.interaction", "SL.lightgbm"),
-              learners_b = c("SL.glm", "SL.glm.interaction", "SL.lightgbm"),
-              learners_h = c("SL.glm", "SL.glm.interaction", "SL.lightgbm"),
-              learners_u = c("SL.glm", "SL.glm.interaction", "SL.lightgbm"),
-              learners_v = c("SL.glm", "SL.glm.interaction", "SL.lightgbm"))
+              folds = folds)
 }, .id = "n")
 
 res <- mutate(res, 

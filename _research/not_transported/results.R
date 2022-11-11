@@ -20,14 +20,22 @@ res <- bind_rows(read_zip(glue("_research/data/sim_not_transported.zip")))
 direct <- truth()["direct"]
 indirect <- truth()["indirect"]
 
-filter(res, estimand == "direct") |> 
-    group_by(n) |> 
-    summarise(abs_bias = abs(mean(psi) - direct), 
-              covr = mean(map2_lgl(conf_low, conf_high, ~ between(direct, .x, .y)))) |> 
-    mutate(rootn_bias = abs_bias * sqrt(n))
+bind_rows(
+    {
+        group_by(res, n) |> 
+            summarise(abs_bias = abs(mean(direct) - !!direct), 
+                      covr = mean(map2_lgl(ci_direct_low, ci_direct_high, ~ between(!!direct, .x, .y)))) |> 
+            mutate(rootn_bias = abs_bias * sqrt(n), 
+                   estimand = "direct")
+    }, {
+        group_by(res, n) |> 
+            summarise(abs_bias = abs(mean(indirect) - !!indirect), 
+                      covr = mean(map2_lgl(ci_indirect_low, ci_indirect_high, ~ between(!!indirect, .x, .y)))) |> 
+            mutate(rootn_bias = abs_bias * sqrt(n), 
+                   estimand = "indirect")
+    }
+) |> 
+    select(estimand, n, abs_bias, rootn_bias, covr)
 
-filter(res, estimand == "indirect") |> 
-    group_by(n) |> 
-    summarise(abs_bias = abs(mean(psi) - indirect), 
-              covr = mean(map2_lgl(conf_low, conf_high, ~ between(indirect, .x, .y)))) |> 
-    mutate(rootn_bias = abs_bias * sqrt(n))
+
+

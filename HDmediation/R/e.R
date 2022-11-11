@@ -12,5 +12,6 @@ e <- function(data, npsem, folds, learners) {
         emat[folds[[v]]$validation_set, "e(0|m,w)"] <- 1 - preds
         emat[folds[[v]]$validation_set, "e(1|m,w)"] <- preds
     }
+
     emat
 }

@@ -1,57 +1,37 @@
-source("_research/gen_data.R")
+suppressPackageStartupMessages({
+    library(HDmediation)
+    library(glue)
+    library(tidyverse)
+})
+
+source("_research/transported/gendata.R")
 source("_research/SL.lightgbm.R")
+source("_research/SL.glmnet3.R")
 
-library(furrr)
-library(glue)
-n <- 500
+id <- Sys.getenv("SGE_TASK_ID")
+if (id == "undefined" || id == "") id <- 1
 
-# id <- Sys.getenv("SGE_TASK_ID")
-# 
-# if (id == "undefined" || id == "") id <- 1
-
-simulate <- function(n, folds = 1) {
-    dat <- gen_data(n)
+res <- map_dfr(c(500, 1000, 5000, 1e4), function(n) {
+    dat <- gendata(n)
     
-    A <- "A"
-    S <- "S"
-    W <- "W1"
-    Z <- "Z"
-    M <- "M"
-    Y <- "Y"
+    # folds <- case_when(n <= 1000 ~ 10,
+    #                    n == 5000 ~ 4,
+    #                    TRUE ~ 2)
+    folds <- 1
     
-    psi <- tmce::tmce(dat, A, S, W, Z, M, Y, "binomial", folds = folds)
-    
-    data.frame(n = n,
-               direct = psi$direct,
-               var_direct = psi$var_direct,
-               indirect = psi$indirect,
-               var_indirect = psi$var_indirect)
+    mediation(dat, "A", "W1", 
+              c("Z1", "Z2"), 
+              c("M1", "M2"), "Y", "S", 
+              family = "binomial", 
+              folds = folds)
+}, .id = "n")
 
-    # write.csv(
-    #     data.frame(
-    #         n = n,
-    #         direct = psi$direct,
-    #         var_direct = psi$var_direct,
-    #         indirect = psi$indirect,
-    #         var_indirect = psi$var_indirect
-    #     ),
-    #     glue::glue("_research/sim/data/{id}-{n}.csv"),
-    #     row.names = FALSE
-    # )
-}
+res <- mutate(res, 
+              n = case_when(
+                  n == 1 ~ 500, 
+                  n == 2 ~ 1000, 
+                  n == 3 ~ 5000, 
+                  n == 4 ~ 1e4
+              ))
 
-# args <- commandArgs(trailingOnly = TRUE)
-
-# args <- list(
-#     10000
-# )
-
-plan(multisession, workers = 5)
-
-res <- future_map_dfr(1:500, simulate, n = n)
-saveRDS(res, glue("_research/data/sim_{n}.rds"))
-
-plan(sequential)
-# simulate(as.numeric(args[[1]]), 1)
-# 
-# quit("no")
+saveRDS(res, glue("_research/data/sim_transported_{id}.rds"))

@@ -8,26 +8,11 @@ b <- function(data, npsem, family, folds, learners, ...) {
         valid_1[[npsem$A]] <- 1
         valid_0[[npsem$A]] <- 0
 
-        preds <- crossfit(train, list(valid_0, valid_1), npsem$Y, npsem$history("Y")[-1],
+        preds <- crossfit(train, list(valid_0, valid_1), npsem$Y,
+                          c(npsem$W, npsem$A, npsem$Z, npsem$M),
                           family, learners = learners)
         b[folds[[v]]$validation_set, 1] <- preds[[1]]
         b[folds[[v]]$validation_set, 2] <- preds[[2]]
     }
-    b
-}
-
-true_b <- function(data) {
-    b <- matrix(nrow = nrow(data), ncol = 2)
-    colnames(b) <- c("b(0,Z,M,W)", "b(1,Z,M,W)")
-
-    my <- function(m, z, w) {
-        plogis(-log(5) + log(8) * z  + log(4) * m - log(1.2) * w[, "W1"] + log(1.2) * w[, "W1"] * z)
-    }
-
-    z <- data$Z
-    m <- data$M
-    w <- data[, c("W0", "W1")]
-
-    b[, 1] <- b[, 2] <- my(m, z, w)
     b
 }
