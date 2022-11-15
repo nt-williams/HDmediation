@@ -4,12 +4,22 @@ suppressPackageStartupMessages({
     library(tidyverse)
 })
 
-source("_research/not_transported/gendata.R")
+# gendata.R is multivariate M and Z
+# gendata2.R is binary M and Z
+dgp <- 2
+if (dgp == 1) {
+    source("_research/not_transported/gendata.R")
+} else {
+    source("_research/not_transported/gendata2.R")
+}
+
 source("_research/SL.lightgbm.R")
 source("_research/SL.glmnet3.R")
 
 id <- Sys.getenv("SGE_TASK_ID")
 if (id == "undefined" || id == "") id <- 1
+
+learners <- c("SL.glm", "SL.glm.interaction", "SL.mean", "SL.lightgbm", "SL.glmnet3", "SL.earth")
 
 res <- map_dfr(c(500, 1000, 5000, 1e4), function(n) {
     dat <- gendata(n)
@@ -18,12 +28,21 @@ res <- map_dfr(c(500, 1000, 5000, 1e4), function(n) {
     #                    n == 5000 ~ 4,
     #                    TRUE ~ 2)
     folds <- 1
+    z <- names(dat)[startsWith(names(dat), "Z")]
+    m <- names(dat)[startsWith(names(dat), "M")]
     
     mediation(dat, "A", "W1", 
-              c("Z1", "Z2"), 
-              c("M1", "M2"), "Y", 
+              z, m, "Y", 
               family = "binomial", 
-              folds = folds)
+              folds = folds, 
+              learners_g = "SL.mean", 
+              learners_b = learners, 
+              learners_e = learners, 
+              learners_hz = learners, 
+              learners_u = learners, 
+              learners_ubar = learners, 
+              learners_v = learners, 
+              learners_vbar = learners)
 }, .id = "n")
 
 res <- mutate(res, 
@@ -34,4 +53,4 @@ res <- mutate(res,
                   n == 4 ~ 1e4
               ))
 
-saveRDS(res, glue("_research/data/sim_not_transported_{id}.rds"))
+saveRDS(res, glue("_research/data/sim_not_transported_{dgp}_{id}.rds"))
