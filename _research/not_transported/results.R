@@ -35,7 +35,8 @@ bind_rows(
                    estimand = "indirect")
     }
 ) |> 
-    select(estimand, n, abs_bias, rootn_bias, covr)
+    select(estimand, n, abs_bias, rootn_bias, covr) |>
+    saveRDS("_research/data/summary_not_transported.rds")
 
 
 
