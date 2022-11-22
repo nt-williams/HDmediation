@@ -4,7 +4,7 @@ g <- function(a) {
 }
 
 pz1 <- function(z, a, w, s) {
-    prob1 <- plogis(-log(2) + (log(4) * a) - log(2) * w[, "W1"] + log(1.4)*s)
+    prob1 <- plogis(-log(2) + (log(7) * a) - log(2) * w[, "W1"] + log(1.4)*s)
     z * prob1 + (1 - z) * (1 - prob1)
 }
 
@@ -18,12 +18,12 @@ pz <- function(z1, z2, a, w, s) {
 }
 
 pm1 <- function(m, z1, a, w, s) {
-    prob1 <- plogis(-log(2) + log(4) * z1 - log(1.4) * w[, "W1"] + log(0.3)*s)
+    prob1 <- plogis(-log(2) + log(7) * z1 - log(1.4) * w[, "W1"] + log(0.3)*s)
     m * prob1 + (1 - m) * (1 - prob1)
 }
 
 pm2 <- function(m, z2, a, w, s) {
-    prob1 <- plogis(0.05 + log(1.8) * z2 - log(1.4) * w[, "W1"] + log(0.1)*s)
+    prob1 <- plogis(0.05 + log(0.4) * z2 - log(1.4) * w[, "W1"] + log(0.1)*s)
     m * prob1 + (1 - m) * (1 - prob1)
 }
 
