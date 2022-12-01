@@ -12,8 +12,8 @@ u <- function(data, npsem, bb, hm, aprime, folds, learners, ...) {
 
         u[folds[[v]]$validation_set, "u(z,w)"] <-
             crossfit(train, list(valid), "b(a',Z,M,W)hm(Z,M,W)",
-                     c(npsem$Z, npsem$A, npsem$W, npsem$S), "gaussian",
-                     learners = learners)[[1]]
+                     c(npsem$Z, npsem$A, npsem$W, npsem$S),
+                     "gaussian", learners = learners)[[1]]
     }
     u
 }
@@ -32,8 +32,8 @@ ubar <- function(data, npsem, uu, aprime, folds, learners, ...) {
 
         ubar[folds[[v]]$validation_set, "ubar(w)"] <-
             crossfit(train, list(valid), "u(z,w)",
-                     c(npsem$A, npsem$W, npsem$S), "gaussian",
-                     learners = learners)[[1]]
+                     c(npsem$A, npsem$W, npsem$S),
+                     "gaussian", learners = learners)[[1]]
         }
     ubar
 }

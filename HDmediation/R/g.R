@@ -8,7 +8,7 @@ g <- function(data, npsem, folds, learners) {
         try(valid[[npsem$S]] <- 0, silent = TRUE)
 
         preds <- crossfit(train, list(valid), npsem$A, c(npsem$W, npsem$S),
-                          "binomial", learners = learners)[[1]]
+                          "binomial", learners = learners, bound = TRUE)[[1]]
 
         gmat[folds[[v]]$validation_set, "g(0|w)"] <- 1 - preds
         gmat[folds[[v]]$validation_set, "g(1|w)"] <- preds

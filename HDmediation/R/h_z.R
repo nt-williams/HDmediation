@@ -10,14 +10,14 @@ h_z <- function(data, npsem, folds, learners, ...) {
         valid_0[[npsem$A]] <- 0
 
         p_zmw <- crossfit(train, list(valid_0, valid_1), "tmp_tmce_delta",
-                          c(npsem$Z, npsem$M, npsem$W, npsem$S, npsem$A),
+                          c(npsem$Z, npsem$M, npsem$W, npsem$A, npsem$S),
                           id = "tmp_tmce_id",
-                          "binomial", learners = learners)
+                          "binomial", learners = learners, bound = TRUE)
 
         p_mw <- crossfit(train, list(valid_0, valid_1), "tmp_tmce_delta",
-                         c(npsem$M, npsem$W, npsem$S, npsem$A),
+                         c(npsem$M, npsem$W, npsem$A, npsem$S),
                          id = "tmp_tmce_id",
-                         "binomial", learners = learners)
+                         "binomial", learners = learners, bound = TRUE)
 
         h_z[folds[[v]]$validation_set, "h_z(0)"] <-
             (p_zmw[[1]] / (1 - p_zmw[[1]])) * ((1 - p_mw[[1]]) / p_mw[[1]])
@@ -31,7 +31,7 @@ h_z <- function(data, npsem, folds, learners, ...) {
 stack_data <- function(data, npsem) {
     delta <- data
 
-    # need to rethink how this would work with countinuous variables
+    # need to rethink how this would work with continuous variables
     # sample from a uniform distribution with min and max from the observed data
     # would be easiest just to sample from the empirical distribution...
     vals_M <- unique(data[, npsem$M, drop = FALSE])

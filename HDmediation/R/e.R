@@ -8,7 +8,7 @@ e <- function(data, npsem, folds, learners) {
         try(valid[[npsem$S]] <- 0, silent = TRUE)
 
         preds <- crossfit(train, list(valid), npsem$A, c(npsem$M, npsem$W, npsem$S),
-                          "binomial", learners = learners)[[1]]
+                          "binomial", learners = learners, bound = TRUE)[[1]]
         emat[folds[[v]]$validation_set, "e(0|m,w)"] <- 1 - preds
         emat[folds[[v]]$validation_set, "e(1|m,w)"] <- preds
     }

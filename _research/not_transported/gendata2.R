@@ -9,7 +9,7 @@ pz <- function(z, a, w) {
 }
 
 pm <- function(m, z, a, w) {
-    prob1 <- plogis(-log(2) + log(7) * z - log(1.4) * w[, "W1"])
+    prob1 <- plogis(-log(2) + log(12) * z - log(1.4) * w[, "W1"])
     m * prob1 + (1 - m) * (1 - prob1)
 }
 
@@ -26,19 +26,19 @@ r <- function(z, a, m, w) {
     pm(m, z, a, w) * pz(z, a, w) / pmaw(m, a, w)
 }
 
-e <- function(a, m1, m2, w) {
+e <- function(a, m, w) {
     pmaw(m, a, w) * g(a) / pmw(m, w)
 }
 
 my <- function(m, z, a, w) {
-    plogis(-log(5) + log(8) * z  + log(4) * m -
+    plogis(-log(5) + log(8) * z + log(10) * m -
                log(1.2) * w[, "W1"] + log(1.2) * w[, "W1"] * z)
 }
 
-# u <- function(z, w, aprime, astar) {
-#     my(1, z, aprime, w) * pmaw(1, astar, w) + my(0, z, aprime, w) * pmaw(0, astar, w)
-# }
-#
+u <- function(z, w, aprime, astar) {
+    my(1, z, aprime, w) * pmaw(1, astar, w) + my(0, z, aprime, w) * pmaw(0, astar, w)
+}
+
 # intu <- function(w, aprime, astar) {
 #     u(1, w, aprime, astar) * pz(1, aprime, w) +
 #         u(0, w, aprime, astar) * pz(0, aprime, w)
@@ -59,7 +59,7 @@ gendata <- function(N) {
     data.frame(W1 = w1, A = a, Z = z, M = m, Y = y)
 }
 
-# h <- pmaw(m1, m2, astar, w) / pm(m1, m2, z1, z2, aprime, w)
+# h <- pmaw(m, astar, w) / pm(m, z, aprime, w)
 
 truth <- function() {
     w <- expand.grid(W1 = c(0, 1))

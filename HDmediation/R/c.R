@@ -10,7 +10,7 @@ see <- function(data, npsem, folds, learners, ...) {
 
         preds <- crossfit(train, list(valid_0, valid_1), npsem$S,
                           c(npsem$A, npsem$Z, npsem$M, npsem$W), "binomial",
-                          learners = learners)
+                          learners = learners, bound = TRUE)
         cmat[folds[[v]]$validation_set, 1] <- preds[[1]]
         cmat[folds[[v]]$validation_set, 2] <- preds[[2]]
     }

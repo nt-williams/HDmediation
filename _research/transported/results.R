@@ -1,8 +1,6 @@
 suppressPackageStartupMessages(library(tidyverse))
 library(glue)
 
-source("_research/transported/gendata.R")
-
 read_zip <- function(tar) {
     files <- unzip(tar, list = TRUE)$Name
     p <- progressr::progressor(along = 1:length(files))
@@ -15,20 +13,29 @@ read_zip <- function(tar) {
     })
 }
 
-res <- bind_rows(read_zip(glue("_research/data/sim_transported.zip")))
+dgp <- 2
+if (dgp == 1) {
+    source("_research/transported/gendata.R")
+    res <- bind_rows(read_zip(glue("_research/data/sim_transported_sat_1.zip")))
+} else {
+    source("_research/transported/gendata2.R")
+    res <- bind_rows(read_zip(glue("_research/data/sim_transported_sat_2.zip")))
+}
 
 direct <- truth()["direct"]
 indirect <- truth()["indirect"]
 
 bind_rows(
     {
-        group_by(res, n) |>
+        filter(res, between(direct, 0, 1)) |> 
+            group_by(n) |>
             summarise(abs_bias = abs(mean(direct) - !!direct),
                       covr = mean(map2_lgl(ci_direct_low, ci_direct_high, ~ between(!!direct, .x, .y)))) |>
             mutate(rootn_bias = abs_bias * sqrt(n),
                    estimand = "direct")
     }, {
-        group_by(res, n) |>
+        filter(res, between(indirect, 0, 1)) |> 
+            group_by(n) |>
             summarise(abs_bias = abs(mean(indirect) - !!indirect),
                       covr = mean(map2_lgl(ci_indirect_low, ci_indirect_high, ~ between(!!indirect, .x, .y)))) |>
             mutate(rootn_bias = abs_bias * sqrt(n),
@@ -36,7 +43,7 @@ bind_rows(
     }
 ) |>
     select(estimand, n, abs_bias, rootn_bias, covr) |>
-    saveRDS("_research/data/summary_transported.rds")
+    saveRDS(glue("_research/data/summary_transported_sat_{dgp}.rds"))
 
 
 

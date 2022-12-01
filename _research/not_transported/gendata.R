@@ -18,12 +18,12 @@ pz <- function(z1, z2, a, w) {
 }
 
 pm1 <- function(m, z1, a, w) {
-    prob1 <- plogis(-log(2) + log(7) * z1 - log(1.4) * w[, "W1"])
+    prob1 <- plogis(-log(2) + log(10) * z1 - log(1.4) * w[, "W1"])
     m * prob1 + (1 - m) * (1 - prob1)
 }
 
 pm2 <- function(m, z2, a, w) {
-    prob1 <- plogis(0.05 + log(2.5) * z2 - log(1.4) * w[, "W1"])
+    prob1 <- plogis(0.05 + log(10) * z2 - log(1.4) * w[, "W1"])
     m * prob1 + (1 - m) * (1 - prob1)
 }
 
@@ -58,8 +58,8 @@ e <- function(a, m1, m2, w) {
 }
 
 my <- function(m1, m2, z1, z2, a, w) {
-    plogis(-log(5) + log(8) * z1  + log(4) * m1 - 
-               log(1.2) * w[, "W1"] - log(2) * z2 + log(1.2) * m2 + 
+    plogis(-log(5) + log(8) * z1  + log(5) * m1 - 
+               log(1.2) * w[, "W1"] - log(2) * z2 + log(4) * m2 + 
                log(1.2) * w[, "W1"] * z1)
 }
 

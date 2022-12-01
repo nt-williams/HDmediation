@@ -1,4 +1,4 @@
-not_transported <- function(data, A, W, Z, M, Y, family, folds = 1,
+not_transported <- function(data, A, W, Z, M, Y, family, folds = 1, partial_tmle, bounds,
                             learners_g = c("SL.glm", "SL.glm.interaction", "SL.mean"),
                             learners_e = c("SL.glm", "SL.glm.interaction", "SL.mean"),
                             learners_b = c("SL.glm", "SL.glm.interaction", "SL.mean"),
@@ -9,6 +9,10 @@ not_transported <- function(data, A, W, Z, M, Y, family, folds = 1,
                             learners_vbar = c("SL.glm", "SL.glm.interaction", "SL.mean")) {
     npsem <- Npsem$new(A = A, W = W, Z = Z, M = M, Y = Y)
     folds <- make_folds(data, folds)
+
+    bounds <- scale_y(data[[npsem$Y]], family, bounds)
+    data[[npsem$Y]] <- Y <- bounds$y
+    A <- data[[npsem$A]]
 
     gg <- g(data, npsem, folds, learners_g)
     ee <- e(data, npsem, folds, learners_e)
@@ -23,32 +27,29 @@ not_transported <- function(data, A, W, Z, M, Y, family, folds = 1,
         astar <- param[2]
 
         hm <- h_m(hz, gg, ee, aprime, astar)
+
+        ipwy <- (A == aprime) / gg[, gl("g({aprime}|w)")]
+        if (partial_tmle) {
+            fit <- glm(Y ~ 1, offset = qlogis(bb[, gl("b({aprime},Z,M,W)")]), family = "binomial",
+                       subset = A == aprime, weights = ipwy * hm / mean(ipwy * hm))
+            bb[, gl("b({aprime},Z,M,W)")] <- plogis(coef(fit) + qlogis(bb[, gl("b({aprime},Z,M,W)")]))
+        }
+
         uu <- u(data, npsem, bb, hm, aprime, folds, learners_u)
         uubar <- ubar(data, npsem, uu, aprime, folds, learners_ubar)
         vv <- v(data, npsem, bb, hz, aprime, folds, learners_v)
-        vvbar[, paste(param, collapse = "")] <-
-            vbar(data, npsem, vv, astar, folds, learners_vbar)
+        vvbar[, paste(param, collapse = "")] <- vbar(data, npsem, vv, astar, folds, learners_vbar)
 
         # EIF calculation
-        A <- data[[npsem$A]]
-        Y <- data[[npsem$Y]]
+        eify <- ipwy * hm / mean(ipwy * hm) * (Y - bb[, gl("b({aprime},Z,M,W)")])
 
-        eify <-
-            (A == aprime) /
-            gg[, gl("g({aprime}|w)")] *
-            hm * (Y - bb[, gl("b({aprime},Z,M,W)")])
+        ipwz <- (A == aprime) / gg[, gl("g({aprime}|w)")]
+        eifz <- ipwz / mean(ipwz) * (uu[, 1] - uubar[, 1])
 
-        eifz <-
-            (A == aprime) /
-            gg[, gl("g({aprime}|w)")] *
-            (uu[, 1] - uubar[, 1])
+        ipwm <- (A == astar) / gg[, gl("g({astar}|w)")]
+        eifm <- ipwm / mean(ipwm) * (vv[, 1] - vvbar[, paste(param, collapse = "")])
 
-        eifm <-
-            (A == astar) /
-            gg[, gl("g({astar}|w)")] *
-            (vv[, 1] - vvbar[, paste(param, collapse = "")])
-
-        eif <- eify + eifz + eifm + vvbar[, paste(param, collapse = "")]
+        eif <- rescale_y(eify + eifz + eifm + vvbar[, paste(param, collapse = "")], bounds$bounds)
         theta <- mean(eif)
 
         thetas <- c(thetas, list(theta))

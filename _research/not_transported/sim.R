@@ -6,20 +6,37 @@ suppressPackageStartupMessages({
 
 # gendata.R is multivariate M and Z
 # gendata2.R is binary M and Z
-dgp <- 2
+dgp <- 1
 if (dgp == 1) {
     source("_research/not_transported/gendata.R")
 } else {
     source("_research/not_transported/gendata2.R")
 }
 
-source("_research/SL.lightgbm.R")
-source("_research/SL.glmnet3.R")
+# source("_research/SL.lightgbm.R")
+# source("_research/SL.glmnet3.R")
 
 id <- Sys.getenv("SGE_TASK_ID")
 if (id == "undefined" || id == "") id <- 1
 
-learners <- c("SL.glm", "SL.glm.interaction", "SL.mean", "SL.lightgbm", "SL.glmnet3", "SL.earth")
+SL.glm.saturated <- function(Y, X, newX, family, obsWeights, ...) {
+    if (is.matrix(X)) {
+        X = as.data.frame(X)
+    }
+    f <- as.formula(paste0("Y ~ .^", ncol(X)))
+    fit.glm <- glm(f, data = X, family = family, weights = obsWeights)
+    if (is.matrix(newX)) {
+        newX = as.data.frame(newX)
+    }
+    pred <- predict(fit.glm, newdata = newX, type = "response")
+    fit <- list(object = fit.glm)
+    class(fit) <- "SL.glm"
+    out <- list(pred = pred, fit = fit)
+    return(out)
+}
+
+learners <- c("SL.glm.saturated")
+# learners <- c("SL.glm", "SL.glm.interaction", "SL.mean", "SL.lightgbm", "SL.glmnet3", "SL.earth")
 
 res <- map_dfr(c(500, 1000, 5000, 1e4), function(n) {
     dat <- gendata(n)
@@ -53,4 +70,4 @@ res <- mutate(res,
                   n == 4 ~ 1e4
               ))
 
-saveRDS(res, glue("_research/data/sim_not_transported_{dgp}_{id}.rds"))
+saveRDS(res, glue("_research/data/sim_not_transported_sat_{dgp}_{id}.rds"))
