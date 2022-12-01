@@ -1,7 +1,7 @@
 Package: HDmediation
 Type: Package
 Title: Interventional (In)Direct Effects
-Version: 0.1.0.5000
+Version: 0.1.0.9000
 Authors@R: 
     c(person(given = "Nicholas",
              family = "Williams",

@@ -24,6 +24,8 @@
 #'  Outcome variable type (i.e., "gaussian", "binomial").
 #' @param folds [\code{integer(1)}]\cr
 #'  The number of folds to be used for cross-fitting.
+#' @param partial_tmle [\code{logical(1)}]\cr
+#' @param bounds [\code{numeric(2)}]\cr
 #' @param learners_g [\code{character}]\cr A vector of \code{SuperLearner} algorithms for estimation
 #'  of the exposure mechanism.
 #' @param learners_e [\code{character}]\cr A vector of \code{SuperLearner} algorithms.
@@ -65,6 +67,7 @@
 #' mediation(tmp, "A", c("W0", "W1"), "Z", "M", "Y", "S", "binomial", 1)
 mediation <- function(data, A, W, Z, M, Y, S = NULL,
                       family = c("binomial", "gaussian"), folds = 1,
+                      partial_tmle = TRUE, bounds = NULL,
                       learners_g = c("SL.glm", "SL.glm.interaction", "SL.mean"),
                       learners_e = c("SL.glm", "SL.glm.interaction", "SL.mean"),
                       learners_c = c("SL.glm", "SL.glm.interaction", "SL.mean"),
@@ -78,18 +81,13 @@ mediation <- function(data, A, W, Z, M, Y, S = NULL,
     checkmate::assertNumber(folds, lower = 1, upper = nrow(data) - 1)
 
     if (!is.null(S)) {
-        ans <- transported(data, A, S, W, Z, M, Y, family, folds,
-                           learners_g, learners_e, learners_c, learners_b,
-                           learners_hz, learners_u, learners_ubar,
-                           learners_v, learners_vbar)
+        ans <- transported(data, A, S, W, Z, M, Y, family, folds, partial_tmle,
+                           bounds, learners_g, learners_e, learners_c, learners_b,
+                           learners_hz, learners_u, learners_ubar, learners_v, learners_vbar)
+        return(ans)
     }
 
-    if (is.null(S)) {
-        ans <- not_transported(data, A, W, Z, M, Y, family, folds,
-                               learners_g, learners_e, learners_b,
-                               learners_hz, learners_u, learners_ubar,
-                               learners_v, learners_vbar)
-    }
-
-    ans
+    not_transported(data, A, W, Z, M, Y, family, folds, partial_tmle,
+                    bounds, learners_g, learners_e, learners_b,
+                    learners_hz, learners_u, learners_ubar, learners_v, learners_vbar)
 }

@@ -14,6 +14,8 @@ mediation(
   S = NULL,
   family = c("binomial", "gaussian"),
   folds = 1,
+  partial_tmle = TRUE,
+  bounds = NULL,
   learners_g = c("SL.glm", "SL.glm.interaction", "SL.mean"),
   learners_e = c("SL.glm", "SL.glm.interaction", "SL.mean"),
   learners_c = c("SL.glm", "SL.glm.interaction", "SL.mean"),
@@ -55,6 +57,10 @@ Outcome variable type (i.e., "gaussian", "binomial").}
 
 \item{folds}{[\code{integer(1)}]\cr
 The number of folds to be used for cross-fitting.}
+
+\item{partial_tmle}{[\code{logical(1)}]\cr}
+
+\item{bounds}{[\code{numeric(2)}]\cr}
 
 \item{learners_g}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms for estimation
 of the exposure mechanism.}
