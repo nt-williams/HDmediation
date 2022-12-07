@@ -13,13 +13,21 @@ read_zip <- function(tar) {
     })
 }
 
-dgp <- 2
+tmle <- F
+dgp <- 3
 if (dgp == 1) {
     source("_research/transported/gendata.R")
-    res <- bind_rows(read_zip(glue("_research/data/sim_transported_sat_1.zip")))
-} else {
+    res <- bind_rows(read_zip(glue("_research/data/sim_transported_1.zip")))
+}
+
+if (dgp == 2) {
     source("_research/transported/gendata2.R")
-    res <- bind_rows(read_zip(glue("_research/data/sim_transported_sat_2.zip")))
+    res <- bind_rows(read_zip(glue("_research/data/sim_transported_{tmle}_2.zip")))
+}
+
+if (dgp == 3) {
+    source("_research/transported/gendata3.R")
+    res <- bind_rows(read_zip(glue("_research/data/sim_transported_{tmle}_1.zip")))
 }
 
 direct <- truth()["direct"]
@@ -27,23 +35,24 @@ indirect <- truth()["indirect"]
 
 bind_rows(
     {
-        filter(res, between(direct, 0, 1)) |> 
+        res |> 
+            #filter(between(direct, -1, 1)) |> 
             group_by(n) |>
-            summarise(abs_bias = abs(mean(direct) - !!direct),
+            summarise(#psi = median(direct), 
+                      abs_bias = abs(median(direct) - !!direct),
                       covr = mean(map2_lgl(ci_direct_low, ci_direct_high, ~ between(!!direct, .x, .y)))) |>
             mutate(rootn_bias = abs_bias * sqrt(n),
                    estimand = "direct")
     }, {
-        filter(res, between(indirect, 0, 1)) |> 
+        res |> 
+            #filter(between(indirect, -1, 1)) |> 
             group_by(n) |>
-            summarise(abs_bias = abs(mean(indirect) - !!indirect),
+            summarise(#psi = median(indirect),
+                      abs_bias = abs(median(indirect) - !!indirect),
                       covr = mean(map2_lgl(ci_indirect_low, ci_indirect_high, ~ between(!!indirect, .x, .y)))) |>
             mutate(rootn_bias = abs_bias * sqrt(n),
                    estimand = "indirect")
     }
 ) |>
     select(estimand, n, abs_bias, rootn_bias, covr) |>
-    saveRDS(glue("_research/data/summary_transported_sat_{dgp}.rds"))
-
-
-
+    saveRDS(glue("_research/data/summary_transported_{tmle}_{dgp}.rds"))

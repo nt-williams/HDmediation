@@ -4,48 +4,28 @@ g <- function(a) {
 }
 
 pz1 <- function(z, a, w, s) {
-    prob1 <- plogis(-log(2) + (log(10) * a) - log(2) * w[, "W1"] + log(1.4)*s)
+    prob1 <- 0.25 + 0.1*a + 0.2*w[, "W1"] - 0.05*s
     z * prob1 + (1 - z) * (1 - prob1)
 }
 
 pz2 <- function(z, a, w, s) {
-    prob1 <- plogis(-log(5) + (log(5) * a) - log(7) * w[, "W1"] + log(1.4)*s)
+    prob1 <- 0.4 + 0.1*a - 0.1*w[, "W1"] + 0.075*s
     z * prob1 + (1 - z) * (1 - prob1)
 }
 
 pm1 <- function(m, z1, a, w, s) {
-    prob1 <- plogis(-log(2) + log(5) * z1 - log(1.4) * w[, "W1"])
+    prob1 <- 0.6 + 0.1*z1 + 0.05*a - 0.3*w[, "W1"]
     m * prob1 + (1 - m) * (1 - prob1)
 }
 
 pm2 <- function(m, z2, a, w, s) {
-    prob1 <- plogis(-log(8) + log(5) * z2 + log(0.5) * w[, "W1"] + log(2)*s)
+    prob1 <- 0.33 + 0.22*z2 + 0.05*a + 0.15*w[, "W1"] - 0.05*s
     m * prob1 + (1 - m) * (1 - prob1)
 }
-
-# pz1 <- function(z, a, w, s) {
-#     prob1 <- plogis(-log(2) + (log(7) * a) - log(2) * w[, "W1"] + log(1.4)*s)
-#     z * prob1 + (1 - z) * (1 - prob1)
-# }
-# 
-# pz2 <- function(z, a, w, s) {
-#     prob1 <- plogis(-(log(1.5) * a) - log(0.55) * w[, "W1"] + log(0.5)*s)
-#     z * prob1 + (1 - z) * (1 - prob1)
-# }
 
 pz <- function(z1, z2, a, w, s) {
     pz1(z1, a, w, s) * pz2(z2, a, w, s)
 }
-
-# pm1 <- function(m, z1, a, w, s) {
-#     prob1 <- plogis(-log(2) + log(7) * z1 - log(1.4) * w[, "W1"] + log(0.3)*s)
-#     m * prob1 + (1 - m) * (1 - prob1)
-# }
-# 
-# pm2 <- function(m, z2, a, w, s) {
-#     prob1 <- plogis(0.05 + log(0.4) * z2 - log(1.4) * w[, "W1"] + log(0.1)*s)
-#     m * prob1 + (1 - m) * (1 - prob1)
-# }
 
 pm <- function(m1, m2, z1, z2, a, w, s) {
     pm1(m1, z1, a, w, s) * pm2(m2, z2, a, w, s)
@@ -84,9 +64,9 @@ my <- function(m1, m2, z1, z2, a, w) {
 }
 
 u <- function(z1, z2, w, aprime, astar) {
-    my(1, 1, z1, z2, aprime, w) * pmaw(1, 1, astar, w, 0) + 
-        my(0, 1, z1, z2, aprime, w) * pmaw(0, 1, astar, w, 0) + 
-        my(0, 0, z1, z2, aprime, w) * pmaw(0, 0, astar, w, 0) + 
+    my(1, 1, z1, z2, aprime, w) * pmaw(1, 1, astar, w, 0) +
+        my(0, 1, z1, z2, aprime, w) * pmaw(0, 1, astar, w, 0) +
+        my(0, 0, z1, z2, aprime, w) * pmaw(0, 0, astar, w, 0) +
         my(1, 0, z1, z2, aprime, w) * pmaw(1, 0, astar, w, 0)
 }
 
@@ -173,9 +153,6 @@ truth <- function() {
         intv(0, 1, w, aprime) * pmaw(0, 1, astar, w, 0) +
         intv(0, 0, w, aprime) * pmaw(0, 0, astar, w, 0)
 
-    c("11" = weighted.mean(v_11, prob_ws0), 
-      "10" = weighted.mean(v_10, prob_ws0), 
-      "00" = weighted.mean(v_00, prob_ws0), 
-      "indirect" = weighted.mean(v_11 - v_10, prob_ws0),
+    c("indirect" = weighted.mean(v_11 - v_10, prob_ws0),
       "direct" = weighted.mean(v_10 - v_00, prob_ws0))
 }

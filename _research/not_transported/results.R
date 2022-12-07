@@ -13,13 +13,14 @@ read_zip <- function(tar) {
     })
 }
 
-dgp <- 1
-if (dgp == 1) {
-    source("_research/not_transported/gendata.R")
-    res <- bind_rows(read_zip(glue("_research/data/sim_not_transported_sat_1.zip")))
+tmle <- F
+dgp <- 2
+if (dgp == 3) {
+    source("_research/not_transported/gendata3.R")
+    res <- bind_rows(read_zip(glue("_research/data/sim_not_transported_{tmle}_3.zip")))
 } else {
     source("_research/not_transported/gendata2.R")
-    res <- bind_rows(read_zip(glue("_research/data/sim_not_transported_sat_2.zip")))
+    res <- bind_rows(read_zip(glue("_research/data/sim_not_transported_{tmle}_2.zip")))
 }
 
 direct <- truth()["direct"]
@@ -27,14 +28,16 @@ indirect <- truth()["indirect"]
 
 bind_rows(
     {
-        filter(res, between(direct, 0, 1)) |> 
+        res |> 
+            #filter(between(direct, -1, 1)) |> 
             group_by(n) |> 
             summarise(abs_bias = abs(mean(direct) - !!direct), 
                       covr = mean(map2_lgl(ci_direct_low, ci_direct_high, ~ between(!!direct, .x, .y)))) |> 
             mutate(rootn_bias = abs_bias * sqrt(n), 
                    estimand = "direct")
     }, {
-        filter(res, between(indirect, 0, 1)) |> 
+        res |> 
+            #filter(between(indirect, -1, 1)) |> 
             group_by(n) |> 
             summarise(abs_bias = abs(mean(indirect) - !!indirect), 
                       covr = mean(map2_lgl(ci_indirect_low, ci_indirect_high, ~ between(!!indirect, .x, .y)))) |> 
@@ -43,4 +46,4 @@ bind_rows(
     }
 ) |> 
     select(estimand, n, abs_bias, rootn_bias, covr) |>
-    saveRDS(glue("_research/data/summary_not_transported_sat_{dgp}.rds"))
+    saveRDS(glue("_research/data/summary_not_transported_{tmle}_{dgp}.rds"))
