@@ -129,6 +129,31 @@ gendata <- function(N) {
     data.frame(S = s, W1 = w1, A = a, Z1 = z1, Z2 = z2, M1 = m1, M2 = m2, Y = y)
 }
 
+If <- function(dat, aprime, astar) {
+    w <- dat[, "W1", drop = F]
+    
+    ipwy <- (dat$A == aprime & dat$S == 1) / g(aprime) * ps(0)
+    hm <- pmaw(dat$M1, dat$M2, astar, w, 0) / pm(dat$M1, dat$M2, dat$Z1, dat$Z2, aprime, w, 0)
+    cs <- ((1 - psazmw(aprime, dat$Z1, dat$Z2, dat$M1, dat$M2, w)) / 
+               psazmw(aprime, dat$Z1, dat$Z2, dat$M1, dat$M2, w))
+    
+    eify <- ipwy * hm * cs * (dat$Y - my(dat$M1, dat$M2, dat$Z1, dat$Z2, aprime, w))
+    
+    ipwz <- (dat$A == aprime & dat$S == 0) / g(aprime) * ps(0)
+    eifz <- ipwz * (u(dat$Z1, dat$Z2, w, aprime, astar) - intu(w, aprime, astar))
+    
+    ipwm <- (dat$A == astar & dat$S == 0) / g(astar) * ps(0)
+    vbar <- intv(1, 1, w, aprime) * pmaw(1, 1, astar, w, 0) + 
+        intv(1, 0, w, aprime) * pmaw(1, 0, astar, w, 0) +
+        intv(0, 1, w, aprime) * pmaw(0, 1, astar, w, 0) + 
+        intv(0, 0, w, aprime) * pmaw(0, 0, astar, w, 0)
+    eifm <- ipwm * (intv(dat$M1, dat$M2, w, aprime) - vbar)
+    
+    eifw <- (dat$S == 0) / ps(0) * (vbar - mean(vbar[dat$S == 0]))
+    
+    eify + eifz + eifm + eifw
+}
+
 truth <- function() {
     w <- expand.grid(W1 = c(0, 1))
 

@@ -14,7 +14,7 @@ read_zip <- function(tar) {
 }
 
 tmle <- F
-dgp <- 2
+dgp <- 3
 if (dgp == 3) {
     source("_research/not_transported/gendata3.R")
     res <- bind_rows(read_zip(glue("_research/data/sim_not_transported_{tmle}_3.zip")))
@@ -25,6 +25,11 @@ if (dgp == 3) {
 
 direct <- truth()["direct"]
 indirect <- truth()["indirect"]
+
+# Efficiency bounds
+tmp <- gendata(5e6)
+bindirect <- var(If(tmp, 1, 1) - If(tmp, 1, 0))
+bdirect <- var(If(tmp, 1, 0) - If(tmp, 0, 0))
 
 bind_rows(
     {

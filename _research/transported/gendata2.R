@@ -35,14 +35,14 @@ my <- function(m, z, a, w) {
                log(1.2) * w[, "W1"] + log(1.2) * w[, "W1"] * z)
 }
 
-# u <- function(z, w, aprime, astar) {
-#     my(1, z, aprime, w) * pmaw(1, astar, w) + my(0, z, aprime, w) * pmaw(0, astar, w)
-# }
-#
-# intu <- function(w, aprime, astar) {
-#     u(1, w, aprime, astar) * pz(1, aprime, w) +
-#         u(0, w, aprime, astar) * pz(0, aprime, w)
-# }
+u <- function(z, w, aprime, astar) {
+    my(1, z, aprime, w) * pmaw(1, astar, w, 0) + my(0, z, aprime, w) * pmaw(0, astar, w, 0)
+}
+
+intu <- function(w, aprime, astar) {
+    u(1, w, aprime, astar) * pz(1, aprime, w, 0) +
+        u(0, w, aprime, astar) * pz(0, aprime, w, 0)
+}
 
 intv <- function(m, w, aprime) {
     my(m, 1, aprime, w) * pz(1, aprime, w, 0) +
@@ -63,6 +63,24 @@ ps <- function(s) {
     psw(s, 1) * pw(1) + psw(s, 0) * pw(0)
 }
 
+pzmars <- function(z, a, w) {
+    pz(z, a, w, 1) * psw(1, w$W1) + pz(z, a, w, 0) * psw(0, w$W1)
+}
+
+psazw <- function(z, a, w) {
+    pz(z, a, w, 1) * psw(1, w$W1) / pzmars(z, a, w)
+}
+
+pmmars <- function(m, z, a, w) {
+    pm(m, z, a, w, 1) * psazw(z, a, w) +
+        pm(m, z, a, w, 0) * (1 - psazw(z, a, w))
+}
+
+psazmw <- function(a, z, m, w) {
+    pm(m, z, a, w, 1) / pmmars(m, z, a, w) *
+        pz(z, a, w, 1) / pzmars(z, a, w) * psw(1, w$W1)
+}
+
 gendata <- function(N) {
     w1 <- rbinom(N, 1, .4)
     w <- data.frame(W1 = w1)
@@ -72,6 +90,27 @@ gendata <- function(N) {
     m <- rbinom(N, 1, pm(1, z, a, w, s))
     y <- rbinom(N, 1, my(m, z, a, w))
     data.frame(S = s, W1 = w1, A = a, Z = z, M = m, Y = y)
+}
+
+If <- function(dat, aprime, astar) {
+    w <- dat[, "W1", drop = F]
+    
+    ipwy <- (dat$A == aprime & dat$S == 1) / g(aprime) * ps(0)
+    hm <- pmaw(dat$M, astar, w, 0) / pm(dat$M, dat$Z, aprime, w, 0)
+    cs <- ((1 - psazmw(aprime, dat$Z, dat$M, w)) / psazmw(aprime, dat$Z, dat$M, w))
+    
+    eify <- ipwy * hm * cs * (dat$Y - my(dat$M, dat$Z, aprime, w))
+    
+    ipwz <- (dat$A == aprime & dat$S == 0) / g(aprime) * ps(0)
+    eifz <- ipwz * (u(dat$Z, w, aprime, astar) - intu(w, aprime, astar))
+    
+    ipwm <- (dat$A == astar & dat$S == 0) / g(astar) * ps(0)
+    vbar <- intv(1, w, aprime) * pmaw(1, astar, w, 0) + intv(0, w, aprime) * pmaw(0, astar, w, 0)
+    eifm <- ipwm * (intv(dat$M, w, aprime) - vbar)
+    
+    eifw <- (dat$S == 0) / ps(0) * (vbar - mean(vbar[dat$S == 0]))
+    
+    eify + eifz + eifm + eifw
 }
 
 truth <- function() {

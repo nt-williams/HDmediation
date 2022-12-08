@@ -39,10 +39,10 @@ u <- function(z, w, aprime, astar) {
     my(1, z, aprime, w) * pmaw(1, astar, w) + my(0, z, aprime, w) * pmaw(0, astar, w)
 }
 
-# intu <- function(w, aprime, astar) {
-#     u(1, w, aprime, astar) * pz(1, aprime, w) +
-#         u(0, w, aprime, astar) * pz(0, aprime, w)
-# }
+intu <- function(w, aprime, astar) {
+    u(1, w, aprime, astar) * pz(1, aprime, w) +
+        u(0, w, aprime, astar) * pz(0, aprime, w)
+}
 
 intv <- function(m, w, aprime) {
     my(m, 1, aprime, w) * pz(1, aprime, w) +
@@ -60,6 +60,23 @@ gendata <- function(N) {
 }
 
 # h <- pmaw(m, astar, w) / pm(m, z, aprime, w)
+
+If <- function(dat, aprime, astar) {
+    w <- dat[, "W1", drop = F]
+    
+    ipwy <- (dat$A == aprime) / g(aprime)
+    hm <- pmaw(dat$M, astar, w) / pm(dat$M, dat$Z, aprime, w)
+    eify <- ipwy * hm * (dat$Y - my(dat$M, dat$Z, aprime, w))
+    
+    ipwz <- ipwy
+    eifz <- ipwz * (u(dat$Z, w, aprime, astar) - intu(w, aprime, astar))
+    
+    ipwm <- (dat$A == astar) / g(astar)
+    vbar <- intv(1, w, aprime) * pmaw(1, astar, w) + intv(0, w, aprime) * pmaw(0, astar, w)
+    eifm <- ipwm * (intv(dat$M, w, aprime) - vbar)
+    
+    eify + eifz + eifm + vbar
+}
 
 truth <- function() {
     w <- expand.grid(W1 = c(0, 1))
