@@ -25,7 +25,8 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     checkmate,
-    glue, 
-    origami, 
-    SuperLearner
+    glue,
+    origami
 RoxygenNote: 7.2.1
+Depends: 
+    mlr3superlearner (>= 0.1.0)

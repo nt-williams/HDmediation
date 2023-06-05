@@ -8,9 +8,13 @@ see <- function(data, npsem, folds, learners, ...) {
         valid_1[[npsem$A]] <- 1
         valid_0[[npsem$A]] <- 0
 
-        preds <- crossfit(train, list(valid_0, valid_1), npsem$S,
-                          c(npsem$A, npsem$Z, npsem$M, npsem$W), "binomial",
-                          learners = learners, bound = TRUE)
+        preds <- crossfit(train[, c(npsem$S, npsem$A, npsem$Z, npsem$M, npsem$W)],
+                          list(valid_0, valid_1),
+                          npsem$S,
+                          "binomial",
+                          learners = learners,
+                          bound = T)
+
         cmat[folds[[v]]$validation_set, 1] <- preds[[1]]
         cmat[folds[[v]]$validation_set, 2] <- preds[[2]]
     }

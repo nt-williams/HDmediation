@@ -7,8 +7,12 @@ g <- function(data, npsem, folds, learners) {
         valid <- origami::validation(data, folds[[v]])
         try(valid[[npsem$S]] <- 0, silent = TRUE)
 
-        preds <- crossfit(train, list(valid), npsem$A, c(npsem$W, npsem$S),
-                          "binomial", learners = learners, bound = TRUE)[[1]]
+        preds <- crossfit(train[, c(npsem$A, npsem$W, npsem$S)],
+                          list(valid),
+                          npsem$A,
+                          "binomial",
+                          learners = learners,
+                          bound = T)[[1]]
 
         gmat[folds[[v]]$validation_set, "g(0|w)"] <- 1 - preds
         gmat[folds[[v]]$validation_set, "g(1|w)"] <- preds

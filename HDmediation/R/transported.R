@@ -1,13 +1,13 @@
 transported <- function(data, A, S, W, Z, M, Y, family, folds = 1, partial_tmle, bounds,
-                        learners_g = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                        learners_e = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                        learners_c = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                        learners_b = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                        learners_hz = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                        learners_u = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                        learners_ubar = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                        learners_v = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                        learners_vbar = c("SL.glm", "SL.glm.interaction", "SL.mean")) {
+                        learners_g = "glm",
+                        learners_e = "glm",
+                        learners_c = "glm",
+                        learners_b = "glm",
+                        learners_hz = "glm",
+                        learners_u = "glm",
+                        learners_ubar = "glm",
+                        learners_v = "glm",
+                        learners_vbar = "glm") {
     npsem <- Npsem$new(A = A, S = S, W = W, Z = Z, M = M, Y = Y)
     folds <- make_folds(data, folds)
 

@@ -21,22 +21,20 @@
 #'  what population an observation belongs to. If not \code{NULL}, transported
 #'  in(direct) will be estimated. \code{S} must be binary, code with 0 and 1.
 #' @param family [\code{character(1)}]\cr
-#'  Outcome variable type (i.e., "gaussian", "binomial").
+#'  Outcome variable type (i.e., "continuous", "binomial").
 #' @param folds [\code{integer(1)}]\cr
 #'  The number of folds to be used for cross-fitting.
 #' @param partial_tmle [\code{logical(1)}]\cr
 #' @param bounds [\code{numeric(2)}]\cr
-#' @param learners_g [\code{character}]\cr A vector of \code{SuperLearner} algorithms for estimation
-#'  of the exposure mechanism.
-#' @param learners_e [\code{character}]\cr A vector of \code{SuperLearner} algorithms.
-#' @param learners_c [\code{character}]\cr A vector of \code{SuperLearner} algorithms.
-#' @param learners_b [\code{character}]\cr A vector of \code{SuperLearner} algorithms for estimation
-#'  of the outcome mechanism.
-#' @param learners_hz [\code{character}]\cr A vector of \code{SuperLearner} algorithms.
-#' @param learners_u [\code{character}]\cr A vector of \code{SuperLearner} algorithms.
-#' @param learners_ubar [\code{character}]\cr A vector of \code{SuperLearner} algorithms.
-#' @param learners_v [\code{character}]\cr A vector of \code{SuperLearner} algorithms.
-#' @param learners_vbar [\code{character}]\cr A vector of \code{SuperLearner} algorithms.
+#' @param learners_g [\code{character}]\cr
+#' @param learners_e [\code{character}]\cr
+#' @param learners_c [\code{character}]\cr
+#' @param learners_b [\code{character}]\cr
+#' @param learners_hz [\code{character}]\cr
+#' @param learners_u [\code{character}]\cr
+#' @param learners_ubar [\code{character}]\cr
+#' @param learners_v [\code{character}]\cr
+#' @param learners_vbar [\code{character}]\cr
 #'
 #' @return A list of the estimates
 #' @export
@@ -66,17 +64,17 @@
 #'
 #' mediation(tmp, "A", c("W0", "W1"), "Z", "M", "Y", "S", "binomial", 1)
 mediation <- function(data, A, W, Z, M, Y, S = NULL,
-                      family = c("binomial", "gaussian"), folds = 1,
+                      family = c("binomial", "continuous"), folds = 1,
                       partial_tmle = TRUE, bounds = NULL,
-                      learners_g = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                      learners_e = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                      learners_c = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                      learners_b = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                      learners_hz = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                      learners_u = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                      learners_ubar = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                      learners_v = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                      learners_vbar = c("SL.glm", "SL.glm.interaction", "SL.mean")) {
+                      learners_g = c("glm"),
+                      learners_e = c("glm"),
+                      learners_c = c("glm"),
+                      learners_b = c("glm"),
+                      learners_hz = c("glm"),
+                      learners_u = c("glm"),
+                      learners_ubar = c("glm"),
+                      learners_v = c("glm"),
+                      learners_vbar = c("glm")) {
     checkmate::assertDataFrame(data[, c(A, S, W, Z, M, Y)])
     checkmate::assertNumber(folds, lower = 1, upper = nrow(data) - 1)
 

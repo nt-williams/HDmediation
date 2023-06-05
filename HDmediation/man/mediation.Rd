@@ -12,19 +12,19 @@ mediation(
   M,
   Y,
   S = NULL,
-  family = c("binomial", "gaussian"),
+  family = c("binomial", "continuous"),
   folds = 1,
   partial_tmle = TRUE,
   bounds = NULL,
-  learners_g = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-  learners_e = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-  learners_c = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-  learners_b = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-  learners_hz = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-  learners_u = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-  learners_ubar = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-  learners_v = c("SL.glm", "SL.glm.interaction", "SL.mean"),
-  learners_vbar = c("SL.glm", "SL.glm.interaction", "SL.mean")
+  learners_g = c("glm"),
+  learners_e = c("glm"),
+  learners_c = c("glm"),
+  learners_b = c("glm"),
+  learners_hz = c("glm"),
+  learners_u = c("glm"),
+  learners_ubar = c("glm"),
+  learners_v = c("glm"),
+  learners_vbar = c("glm")
 )
 }
 \arguments{
@@ -53,7 +53,7 @@ what population an observation belongs to. If not \code{NULL}, transported
 in(direct) will be estimated. \code{S} must be binary, code with 0 and 1.}
 
 \item{family}{[\code{character(1)}]\cr
-Outcome variable type (i.e., "gaussian", "binomial").}
+Outcome variable type (i.e., "continuous", "binomial").}
 
 \item{folds}{[\code{integer(1)}]\cr
 The number of folds to be used for cross-fitting.}
@@ -62,25 +62,23 @@ The number of folds to be used for cross-fitting.}
 
 \item{bounds}{[\code{numeric(2)}]\cr}
 
-\item{learners_g}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms for estimation
-of the exposure mechanism.}
+\item{learners_g}{[\code{character}]\cr}
 
-\item{learners_e}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms.}
+\item{learners_e}{[\code{character}]\cr}
 
-\item{learners_c}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms.}
+\item{learners_c}{[\code{character}]\cr}
 
-\item{learners_b}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms for estimation
-of the outcome mechanism.}
+\item{learners_b}{[\code{character}]\cr}
 
-\item{learners_hz}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms.}
+\item{learners_hz}{[\code{character}]\cr}
 
-\item{learners_u}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms.}
+\item{learners_u}{[\code{character}]\cr}
 
-\item{learners_ubar}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms.}
+\item{learners_ubar}{[\code{character}]\cr}
 
-\item{learners_v}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms.}
+\item{learners_v}{[\code{character}]\cr}
 
-\item{learners_vbar}{[\code{character}]\cr A vector of \code{SuperLearner} algorithms.}
+\item{learners_vbar}{[\code{character}]\cr}
 }
 \value{
 A list of the estimates

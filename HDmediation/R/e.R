@@ -7,8 +7,13 @@ e <- function(data, npsem, folds, learners) {
         valid <- origami::validation(data, folds[[v]])
         try(valid[[npsem$S]] <- 0, silent = TRUE)
 
-        preds <- crossfit(train, list(valid), npsem$A, c(npsem$M, npsem$W, npsem$S),
-                          "binomial", learners = learners, bound = TRUE)[[1]]
+        preds <- crossfit(train[, c(npsem$A, npsem$M, npsem$W, npsem$S)],
+                          list(valid),
+                          npsem$A,
+                          "binomial",
+                          learners = learners,
+                          bound = T)[[1]]
+
         emat[folds[[v]]$validation_set, "e(0|m,w)"] <- 1 - preds
         emat[folds[[v]]$validation_set, "e(1|m,w)"] <- preds
     }

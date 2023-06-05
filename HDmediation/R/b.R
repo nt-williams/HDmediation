@@ -8,9 +8,12 @@ b <- function(data, npsem, family, folds, learners, ...) {
         valid_1[[npsem$A]] <- 1
         valid_0[[npsem$A]] <- 0
 
-        preds <- crossfit(train, list(valid_0, valid_1), npsem$Y,
-                          c(npsem$W, npsem$A, npsem$Z, npsem$M),
-                          family, learners = learners)
+        preds <- crossfit(train[, c(npsem$Y, npsem$W, npsem$A, npsem$Z, npsem$M)],
+                          list(valid_0, valid_1),
+                          npsem$Y,
+                          family,
+                          learners = learners)
+
         b[folds[[v]]$validation_set, 1] <- preds[[1]]
         b[folds[[v]]$validation_set, 2] <- preds[[2]]
     }
