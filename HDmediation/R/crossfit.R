@@ -3,10 +3,11 @@ crossfit <- function(train, valid, y, type = c("binomial", "continuous"), id = N
                               target = y,
                               library = learners,
                               outcome_type = match.arg(type),
-                              folds = 5,
+                              metalearner = "glm",
+                              folds = 10,
                               newdata = valid,
                               group = id)$preds
-    lapply(preds, function(x) bound(x[, 1]))
+    lapply(preds, function(x) bound(x))
 }
 
 bound <- function(x, p = 1e-03) {
