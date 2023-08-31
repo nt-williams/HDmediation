@@ -3,7 +3,6 @@ crossfit <- function(train, valid, y, type = c("binomial", "continuous"), id = N
                               target = y,
                               library = learners,
                               outcome_type = match.arg(type),
-                              metalearner = "glm",
                               folds = 10,
                               newdata = valid,
                               group = id)$preds
