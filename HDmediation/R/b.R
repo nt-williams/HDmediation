@@ -8,7 +8,13 @@ b <- function(data, npsem, family, folds, learners, ...) {
         valid_1[[npsem$A]] <- 1
         valid_0[[npsem$A]] <- 0
 
-        preds <- crossfit(train[, c(npsem$Y, npsem$W, npsem$A, npsem$Z, npsem$M)],
+        if (!is.null(npsem$cens)) {
+            obs <- train[, npsem$cens] == 1
+        } else {
+            obs <- rep(TRUE, nrow(train))
+        }
+
+        preds <- crossfit(train[obs, c(npsem$Y, npsem$W, npsem$A, npsem$Z, npsem$M)],
                           list(valid_0, valid_1),
                           npsem$Y,
                           family,

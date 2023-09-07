@@ -16,6 +16,7 @@
 #'  A vector containing the column names of the mediators.
 #' @param Y [\code{character(1)}]\cr
 #'  A vector containing the column name of the outcome variable.
+#' @param cens [\code{character(1)}]\cr
 #' @param S [\code{character(1)}]\cr
 #'  An optional vector containing the column name for the variable indicating
 #'  what population an observation belongs to. If not \code{NULL}, transported
@@ -35,6 +36,7 @@
 #' @param learners_ubar [\code{character}]\cr
 #' @param learners_v [\code{character}]\cr
 #' @param learners_vbar [\code{character}]\cr
+#' @param learners_cens [\code{character}]\cr
 #'
 #' @return A list of the estimates
 #' @export
@@ -63,7 +65,7 @@
 #' )
 #'
 #' mediation(tmp, "A", c("W0", "W1"), "Z", "M", "Y", "S", "binomial", 1)
-mediation <- function(data, A, W, Z, M, Y, S = NULL,
+mediation <- function(data, A, W, Z, M, Y, cens = NULL, S = NULL,
                       family = c("binomial", "continuous"), folds = 1,
                       partial_tmle = TRUE, bounds = NULL,
                       learners_g = c("glm"),
@@ -74,7 +76,8 @@ mediation <- function(data, A, W, Z, M, Y, S = NULL,
                       learners_u = c("glm"),
                       learners_ubar = c("glm"),
                       learners_v = c("glm"),
-                      learners_vbar = c("glm")) {
+                      learners_vbar = c("glm"),
+                      learners_cens = "glm") {
     checkmate::assertDataFrame(data[, c(A, S, W, Z, M, Y)])
     checkmate::assertNumber(folds, lower = 1, upper = nrow(data) - 1)
 
@@ -85,7 +88,7 @@ mediation <- function(data, A, W, Z, M, Y, S = NULL,
         return(ans)
     }
 
-    not_transported(data, A, W, Z, M, Y, family, folds, partial_tmle,
+    not_transported(data, A, W, Z, M, Y, cens, family, folds, partial_tmle,
                     bounds, learners_g, learners_e, learners_b,
-                    learners_hz, learners_u, learners_ubar, learners_v, learners_vbar)
+                    learners_hz, learners_u, learners_ubar, learners_v, learners_vbar, learners_cens)
 }

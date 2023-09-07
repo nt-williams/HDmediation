@@ -1,4 +1,5 @@
-not_transported <- function(data, A, W, Z, M, Y, family, folds = 1, partial_tmle, bounds,
+not_transported <- function(data, A, W, Z, M, Y, cens,
+                            family, folds = 1, partial_tmle, bounds,
                             learners_g = "glm",
                             learners_e = "glm",
                             learners_b = "glm",
@@ -6,18 +7,24 @@ not_transported <- function(data, A, W, Z, M, Y, family, folds = 1, partial_tmle
                             learners_u = "glm",
                             learners_ubar = "glm",
                             learners_v = "glm",
-                            learners_vbar = "glm") {
-    npsem <- Npsem$new(A = A, W = W, Z = Z, M = M, Y = Y)
+                            learners_vbar = "glm",
+                            learners_cens = "glm") {
+    npsem <- Npsem$new(A = A, W = W, Z = Z, M = M, Y = Y, cens = cens)
     folds <- make_folds(data, folds)
 
     bounds <- scale_y(data[[npsem$Y]], family, bounds)
     data[[npsem$Y]] <- Y <- bounds$y
+    Y <- ifelse(is.na(Y), -999, Y)
     A <- data[[npsem$A]]
 
     gg <- g(data, npsem, folds, learners_g)
     ee <- e(data, npsem, folds, learners_e)
     bb <- b(data, npsem, family, folds, learners_b)
     hz <- h_z(data, npsem, folds, learners_hz)
+
+    if (!is.null(cens)) {
+        prob_obs <- pObs(data, npsem, folds, learners_cens)
+    }
 
     thetas <- eifs <- list()
     vvbar <- matrix(nrow = nrow(data), ncol = 3)
@@ -28,7 +35,15 @@ not_transported <- function(data, A, W, Z, M, Y, family, folds = 1, partial_tmle
 
         hm <- h_m(hz, gg, ee, aprime, astar)
 
-        ipwy <- (A == aprime) / gg[, gl("g({aprime}|w)")]
+        if (!is.null(cens)) {
+            obs <- data[[npsem$cens]]
+            ipcw_ap <- obs / prob_obs[, gl("P(delta=1|A={aprime},Z,M,W)")]
+            ipcw_as <- obs / prob_obs[, gl("P(delta=1|A={astar},Z,M,W)")]
+        } else {
+            ipcw_as <- ipcw_ap <- 1
+        }
+
+        ipwy <- ((A == aprime) / gg[, gl("g({aprime}|w)")])*ipcw_ap
         if (partial_tmle) {
             fit <- glm(Y ~ 1, offset = qlogis(bb[, gl("b({aprime},Z,M,W)")]), family = "binomial",
                        subset = A == aprime, weights = ipwy * hm / mean(ipwy * hm))
@@ -43,10 +58,10 @@ not_transported <- function(data, A, W, Z, M, Y, family, folds = 1, partial_tmle
         # EIF calculation
         eify <- ipwy * hm / mean(ipwy * hm) * (Y - bb[, gl("b({aprime},Z,M,W)")])
 
-        ipwz <- (A == aprime) / gg[, gl("g({aprime}|w)")]
+        ipwz <- ((A == aprime) / gg[, gl("g({aprime}|w)")])*ipcw_ap
         eifz <- ipwz / mean(ipwz) * (uu[, 1] - uubar[, 1])
 
-        ipwm <- (A == astar) / gg[, gl("g({astar}|w)")]
+        ipwm <- ((A == astar) / gg[, gl("g({astar}|w)")])*ipcw_as
         eifm <- ipwm / mean(ipwm) * (vv[, 1] - vvbar[, paste(param, collapse = "")])
 
         eif <- rescale_y(eify + eifz + eifm + vvbar[, paste(param, collapse = "")], bounds$bounds)

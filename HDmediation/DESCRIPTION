@@ -27,7 +27,7 @@ Imports:
     checkmate,
     glue,
     origami
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Depends: 
     mlr3superlearner (>= 0.1.0), 
     doFuture

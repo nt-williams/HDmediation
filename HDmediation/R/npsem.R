@@ -7,13 +7,15 @@ Npsem <- R6::R6Class(
         Z = NULL,
         M = NULL,
         Y = NULL,
-        initialize = function(S = NULL, W, A, Z, M, Y) {
+        cens = NULL,
+        initialize = function(S = NULL, W, A, Z, M, Y, cens = NULL) {
             checkmate::assertCharacter(A)
             checkmate::assertCharacter(W)
             checkmate::assertCharacter(Y)
             checkmate::assertCharacter(Z)
             checkmate::assertCharacter(M)
             checkmate::assertCharacter(S, null.ok = TRUE)
+            checkmate::assertCharacter(cens, null.ok = TRUE)
 
             self$S <- S
             self$W <- W
@@ -21,16 +23,18 @@ Npsem <- R6::R6Class(
             self$M <- M
             self$A <- A
             self$Y <- Y
+            self$cens <- cens
 
             invisible()
         },
-        history = function(var = c("A", "Z", "M", "Y")) {
+        history = function(var = c("A", "Z", "M", "Y", "cens")) {
             switch(
                 match.arg(var),
                 A = private$parents_A(),
                 Z = private$parents_Z(),
                 M = private$parents_M(),
-                Y = private$parents_Y()
+                Y = private$parents_Y(),
+                cens = private$parents_Y()
             )
         }
     ),

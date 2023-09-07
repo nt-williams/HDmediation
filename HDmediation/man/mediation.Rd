@@ -11,6 +11,7 @@ mediation(
   Z,
   M,
   Y,
+  cens = NULL,
   S = NULL,
   family = c("binomial", "continuous"),
   folds = 1,
@@ -24,7 +25,8 @@ mediation(
   learners_u = c("glm"),
   learners_ubar = c("glm"),
   learners_v = c("glm"),
-  learners_vbar = c("glm")
+  learners_vbar = c("glm"),
+  learners_cens = "glm"
 )
 }
 \arguments{
@@ -46,6 +48,8 @@ A vector containing the column names of the mediators.}
 
 \item{Y}{[\code{character(1)}]\cr
 A vector containing the column name of the outcome variable.}
+
+\item{cens}{[\code{character(1)}]\cr}
 
 \item{S}{[\code{character(1)}]\cr
 An optional vector containing the column name for the variable indicating
@@ -79,6 +83,8 @@ The number of folds to be used for cross-fitting.}
 \item{learners_v}{[\code{character}]\cr}
 
 \item{learners_vbar}{[\code{character}]\cr}
+
+\item{learners_cens}{[\code{character}]\cr}
 }
 \value{
 A list of the estimates
