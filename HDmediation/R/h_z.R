@@ -28,25 +28,25 @@ h_z <- function(data, npsem, folds, learners, ...) {
     h_z
 }
 
+uniformly_sample_M <- function(data, M) {
+    out <- foreach(m = M,
+                   .combine = cbind,
+                   .options.future = list(seed = TRUE)) %dofuture% {
+                       sample_M(data[[m]])
+                   }
+    if (length(M) == 1) out <- as.matrix(out)
+    colnames(out) <- M
+    as.data.frame(out)
+}
+
+sample_M <- function(M) {
+    vals_M <- unique(M)
+    vals_M[sample.int(length(vals_M), size = length(M), replace = TRUE)]
+}
+
 stack_data <- function(data, npsem) {
     delta <- data
-
-    # need to rethink how this would work with continuous variables
-    # sample from a uniform distribution with min and max from the observed data
-    # would be easiest just to sample from the empirical distribution...
-    vals_M <- unique(data[, npsem$M, drop = FALSE])
-    for (i in 1:nrow(data)) {
-        delta[i, npsem$M] <- vals_M[sample.int(nrow(vals_M), 1), ]
-    }
-
-    # delta[[npsem$M]] <- sample(x = vals_M,
-    #                            size = nrow(data),
-    #                            replace = TRUE,
-    #                            prob = rep(1 / length(vals_M), length(vals_M)))
-
-    # # sampling from the empirical distribution P_n(m)
-    # delta[, npsem$M] <- sample(data[, npsem$M, drop = FALSE], replace = TRUE)
-
+    delta[, npsem$M] <- uniformly_sample_M(data, npsem$M)[, npsem$M]
     out <- rbind(data, delta)
     out[["tmp_tmce_delta"]] <- rep(c(0, 1), each = nrow(data))
     out[["tmp_tmce_id"]] <- rep(1:nrow(data), times = 2)
