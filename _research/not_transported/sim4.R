@@ -1,13 +1,9 @@
 # READ ME -----------------------------------------------------------------
 #
 #       Author: Nick Williams
-#       Created: 2023-08-22
-# 
+#       Created: 2023-08-24
+#
 # -------------------------------------------------------------------------
-
-# 1: gendata.R is continuous M and Z
-# 2: gendata2.R is binary M and Z
-dgp <- 1
 
 # Fit with partial TMLE or not
 tmle <- TRUE
@@ -21,11 +17,7 @@ library(future)
 id <- Sys.getenv("SGE_TASK_ID")
 if (id == "undefined" || id == "") id <- 1
 
-if (dgp == 1) {
-    source("_research/not_transported/gendata.R")
-} else {
-    source("_research/not_transported/gendata2.R")
-}
+source("_research/not_transported/gendata4.R")
 
 learners <- list("mean", "glm", "earth",
                  list("lightgbm",
@@ -45,32 +37,32 @@ learners <- list("mean", "glm", "earth",
 
 res <- map_dfr(c(500, 1000, 5000, 1e4), function(n) {
     dat <- sample_data(n)
-    
-    folds <- case_when(n == 500 ~ 10, 
-                       n == 1000 ~ 10, 
-                       n == 5000 ~ 4, 
+
+    folds <- case_when(n == 500 ~ 10,
+                       n == 1000 ~ 10,
+                       n == 5000 ~ 4,
                        n == 1e4  ~ 2)
-    
-    mediation(dat, "a", "w", "z", "m", "y", 
-              family = "binomial", 
-              folds = folds, 
+
+    mediation(dat, "a", "w", "z", "m", "y",
+              family = "binomial",
+              folds = folds,
               partial_tmle = tmle,
-              learners_g = learners, 
+              learners_g = learners,
               learners_c = learners,
-              learners_b = learners, 
-              learners_e = learners, 
-              learners_hz = learners, 
-              learners_u = learners, 
-              learners_ubar = learners, 
-              learners_v = learners, 
+              learners_b = learners,
+              learners_e = learners,
+              learners_hz = learners,
+              learners_u = learners,
+              learners_ubar = learners,
+              learners_v = learners,
               learners_vbar = learners)
 }, .id = "n")
 
 res <- mutate(res, n = case_when(
-    n == 1 ~ 500, 
-    n == 2 ~ 1000, 
-    n == 3 ~ 5000, 
+    n == 1 ~ 500,
+    n == 2 ~ 1000,
+    n == 3 ~ 5000,
     n == 4 ~ 1e4
 ))
 
-saveRDS(res, glue("_research/data/sim_not_transported_{tmle}_{dgp}_{id}.rds"))
+saveRDS(res, glue("_research/data/sim_not_transported_{tmle}_cont_{id}.rds"))
