@@ -1,7 +1,10 @@
 suppressPackageStartupMessages({
     library(HDmediation)
     library(glue)
-    library(tidyverse)
+    library(dplyr)
+    library(purrr)
+    library(foreach)
+    library(doFuture)
 })
 
 source("_research/not_transported/gendata4.R")
@@ -16,7 +19,7 @@ source("_research/SL.lightgbm.R")
 id <- Sys.getenv("SGE_TASK_ID")
 if (id == "undefined" || id == "") id <- 1
 
-learners <- c("SL.earth", "SL.lightgbm", "SL.glm.interaction", "SL.nnet", "SL.glm", "SL.mean")
+learners <- c("SL.earth", "SL.lightgbm", "SL.glm.interaction", "SL.glm", "SL.mean")
 folds <- 5
 
 res <- map_dfr(c(500, 1000, 5000, 1e4), function(n) {
