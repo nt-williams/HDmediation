@@ -13,7 +13,7 @@ regress <- function(train, y, x, id, type, learners) {
         train[[y]], train[, x, drop = FALSE], family = family[[1]],
         SL.library = learners, id = id,
         method = "method.NNLS", env = environment(SuperLearner::SuperLearner),
-        cvControl = SuperLearner::SuperLearner.CV.control(V = 2L)
+        cvControl = SuperLearner::SuperLearner.CV.control(V = 5L)
     )
 
     fit
