@@ -28,7 +28,7 @@ res <- map_dfr(c(500, 1000, 5000, 1e4), function(n) {
     z <- names(dat)[startsWith(names(dat), "z")]
     m <- names(dat)[startsWith(names(dat), "m")]
 
-    mediation(dat, "a", "w", "z", "m", "y", "s",
+    mediation(dat, "a", "w", "z", "m", "y", "S",
               family = "binomial",
               folds = folds,
               partial_tmle = tmle,

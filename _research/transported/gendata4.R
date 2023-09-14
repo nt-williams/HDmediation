@@ -3,11 +3,6 @@ pw <- function(w) {
     w * prob1 + (1 - w) * (1 - prob1)
 }
 
-pw <- function(w) {
-    prob1 <- 0.4
-    w * prob1 + (1 - w) * (1 - prob1)
-}
-
 psw <- function(s, w) {
     prob1 <- plogis(log(1.2) * w)
     s * prob1 + (1 - s) * (1 - prob1)
@@ -72,7 +67,7 @@ sample_data <- function(n) {
     z <- (0.25 + 0.1*a + 0.2*w + 0.05*s) + rnorm(n)
     m <- (0.6 + 0.1*z + 0.05*a - 0.3*w + 0.075*s) + rnorm(n)
     y <- rbinom(n, 1, my(m, z, a, w))
-    data.table::data.table(s = as.numeric(s),
+    data.table::data.table(S = as.numeric(s),
                            w = as.numeric(w),
                            a = as.numeric(a),
                            z = as.numeric(z),

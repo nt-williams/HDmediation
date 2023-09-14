@@ -15,8 +15,10 @@ if (transport) {
 } else {
     dgp1t <- readRDS("_research/data/summary_not_transported_TRUE_3.rds")
     dgp2t <- readRDS("_research/data/summary_not_transported_TRUE_2.rds")
+    dgp3t <- readRDS("_research/data/summary_not_transported_TRUE_cont.rds")
     dgp1f <- readRDS("_research/data/summary_not_transported_FALSE_3.rds")
     dgp2f <- readRDS("_research/data/summary_not_transported_FALSE_2.rds")
+    dgp3f <- readRDS("_research/data/summary_not_transported_FALSE_cont.rds")
 }
 
 filter(dgp2f, estimand == "direct") |>
