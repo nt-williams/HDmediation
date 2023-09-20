@@ -37,20 +37,40 @@ h_z <- function(data, npsem, folds, learners, ...) {
     h_z
 }
 
+H_factory <- function(x) {
+    apply(x, 2, function(j) {
+        is_continuous <- any(schoolmath::is.decimal(j))
+        if (is_continuous) {
+            return(H_factory_continuous(j))
+        }
+        H_factory_discrete(j)
+    }, simplify = FALSE)
+}
+
 uniformly_sample_M <- function(data, M) {
     out <- foreach(m = M,
                    .combine = cbind,
                    .options.future = list(seed = TRUE)) %dofuture% {
-                       sample_M(data[[m]])
+                       is_continuous <- any(schoolmath::is.decimal(data[[m]]))
+                       if (is_continuous) {
+                           return(sample_M_continuous(data[[m]]))
+                       }
+                       sample_M_discrete(data[[m]])
                    }
     if (length(M) == 1) out <- as.matrix(out)
     colnames(out) <- M
     as.data.frame(out)
 }
 
-sample_M <- function(M) {
+sample_M_discrete <- function(M) {
     vals_M <- unique(M)
     vals_M[sample.int(length(vals_M), size = length(M), replace = TRUE)]
+}
+
+sample_M_continuous <- function(M) {
+    minx <- min(M)
+    maxx <- max(M)
+    runif(length(M), minx, maxx)
 }
 
 stack_data <- function(data, npsem) {
