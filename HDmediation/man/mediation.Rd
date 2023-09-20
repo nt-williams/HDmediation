@@ -116,5 +116,5 @@ tmp <- data.frame(
     S = site
 )
 
-mediation(tmp, "A", c("W0", "W1"), "Z", "M", "Y", "S", "binomial", 1)
+mediation(tmp, "A", c("W0", "W1"), "Z", "M", "Y", S = "S", family = "binomial", folds = 1)
 }
