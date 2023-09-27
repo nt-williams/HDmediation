@@ -12,7 +12,7 @@ Npsem <- R6::R6Class(
             checkmate::assertCharacter(A)
             checkmate::assertCharacter(W)
             checkmate::assertCharacter(Y)
-            checkmate::assertCharacter(Z)
+            checkmate::assertCharacter(Z, null.ok = TRUE)
             checkmate::assertCharacter(M)
             checkmate::assertCharacter(S, null.ok = TRUE)
             checkmate::assertCharacter(cens, null.ok = TRUE)
