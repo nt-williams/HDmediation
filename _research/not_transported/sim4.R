@@ -5,6 +5,7 @@ suppressPackageStartupMessages({
     library(purrr)
     library(foreach)
     library(doFuture)
+    library(mlr3extralearners)
 })
 
 source("_research/not_transported/gendata4.R")
@@ -12,15 +13,16 @@ source("_research/not_transported/gendata4.R")
 # Fit with partial TMLE or not
 tmle <- T
 
-source("_research/SL.lightgbm.R")
-# source("_research/SL.glm.saturated.R")
-# source("_research/SL.glmnet3.R")
-
 id <- Sys.getenv("SGE_TASK_ID")
 if (id == "undefined" || id == "") id <- 1
 
-learners <- c("SL.earth", "SL.lightgbm", "SL.glm.interaction", "SL.glm", "SL.mean")
 folds <- 5
+
+learners <- list("mean", "glm", 
+                 list("earth", degree = 3, fast.k = 0, fast.beta = 0, id = "earth"),
+                 list("lightgbm", min_data_in_leaf = 5),
+                 list("ranger", num.trees = 500, id = "ranger1"),
+                 list("ranger", num.trees = 1000, id = "ranger2"))
 
 res <- map_dfr(c(500, 1000, 5000, 1e4), function(n) {
     dat <- sample_data(n)
@@ -32,7 +34,7 @@ res <- map_dfr(c(500, 1000, 5000, 1e4), function(n) {
               family = "binomial",
               folds = folds,
               partial_tmle = tmle,
-              learners_g = "SL.mean",
+              learners_g = "glm",
               learners_c = learners,
               learners_b = learners,
               learners_e = learners,
