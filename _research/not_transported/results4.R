@@ -6,35 +6,38 @@ devtools::source_gist("https://gist.github.com/nt-williams/3afb56f503c7f98077722
 
 source("_research/not_transported/gendata4.R")
 
-tmp <- sample_data(1000000)
+# tmp <- sample_data(1000000)
+# 
+# plan(multisession)
+# 
+# ipw00 <- foreach(a = tmp$a, z = tmp$z, m = tmp$m, w = tmp$w,
+#                  .combine = c, .options.future = list(chunk.size = 1e4)) %dofuture% {
+#                      ipw(a, 0, 0, z, m, w)
+#                  }
+# 
+# ipw10 <- foreach(a = tmp$a, z = tmp$z, m = tmp$m, w = tmp$w,
+#                  .combine = c, .options.future = list(chunk.size = 1e4)) %dofuture% {
+#                      ipw(a, 1, 0, z, m, w)
+#                  }
+# 
+# ipw11 <- foreach(a = tmp$a, z = tmp$z, m = tmp$m, w = tmp$w,
+#                  .combine = c, .options.future = list(chunk.size = 1e4)) %dofuture% {
+#                      ipw(a, 1, 1, z, m, w)
+#                  }
+# 
+# plan(sequential)
+# 
+# y11 <- mean(ipw11 * tmp$y)
+# y10 <- mean(ipw10 * tmp$y)
+# y00 <- mean(ipw00 * tmp$y)
+# indirect <- y11 - y10
+# direct <- y10 - y00
+direct <- 0.0287812
+indirect <- 0.01205885
 
-plan(multisession)
-
-ipw00 <- foreach(a = tmp$a, z = tmp$z, m = tmp$m, w = tmp$w,
-                 .combine = c, .options.future = list(chunk.size = 1e4)) %dofuture% {
-                     ipw(a, 0, 0, z, m, w)
-                 }
-
-ipw10 <- foreach(a = tmp$a, z = tmp$z, m = tmp$m, w = tmp$w,
-                 .combine = c, .options.future = list(chunk.size = 1e4)) %dofuture% {
-                     ipw(a, 1, 0, z, m, w)
-                 }
-
-ipw11 <- foreach(a = tmp$a, z = tmp$z, m = tmp$m, w = tmp$w,
-                 .combine = c, .options.future = list(chunk.size = 1e4)) %dofuture% {
-                     ipw(a, 1, 1, z, m, w)
-                 }
-
-plan(sequential)
-
-y11 <- mean(ipw11 * tmp$y)
-y10 <- mean(ipw10 * tmp$y)
-y00 <- mean(ipw00 * tmp$y)
-indirect <- y11 - y10
-direct <- y10 - y00
-
-tmle <- FALSE
-res <- map_dfr(1:2, function(i) bind_rows(read_zip_rds(glue("_research/data/sim_not_transported_{tmle}_cont_{i}.zip"))))
+tmle <- T
+res <- bind_rows(read_zip_rds(glue("_research/data/sim_not_transported_{tmle}_cont_hal.zip")))
+# res <- map_dfr(1:2, function(i) bind_rows(read_zip_rds(glue("_research/data/sim_not_transported_{tmle}_cont_{i}.zip"))))
 
 bind_rows(
     {
@@ -55,5 +58,4 @@ bind_rows(
                    estimand = "indirect")
     }
 ) |>
-    select(estimand, n, abs_bias, rootn_bias, covr) |>
-    saveRDS(glue("_research/data/summary_not_transported_{tmle}_cont.rds"))
+    select(estimand, n, abs_bias, rootn_bias, covr)

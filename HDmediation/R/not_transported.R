@@ -20,13 +20,14 @@ not_transported <- function(data, A, W, Z, M, Y, cens,
     gg <- g(data, npsem, folds, learners_g)
     ee <- e(data, npsem, folds, learners_e)
     bb <- b(data, npsem, family, folds, learners_b)
+    # browser()
     hz <- h_z(data, npsem, folds, learners_hz)
 
     if (!is.null(cens)) {
         prob_obs <- pObs(data, npsem, folds, learners_cens)
     }
 
-    thetas <- eifs <- list()
+    thetas <- ipws <- eifs <- list()
     vvbar <- matrix(nrow = nrow(data), ncol = 3)
     colnames(vvbar) <- c("00", "10", "11")
     for (param in list(c(1, 1), c(1, 0), c(0, 0))) {
@@ -57,27 +58,34 @@ not_transported <- function(data, A, W, Z, M, Y, cens,
 
         # EIF calculation
         eify <- ipwy * hm / mean(ipwy * hm) * (Y - bb[, gl("b({aprime},Z,M,W)")])
+        # eify <- ipwy * hm * (Y - bb[, gl("b({aprime},Z,M,W)")])
 
         ipwz <- ((A == aprime) / gg[, gl("g({aprime}|w)")])*ipcw_ap
         eifz <- ipwz / mean(ipwz) * (uu[, 1] - uubar[, 1])
+        # eifz <- ipwz  * (uu[, 1] - uubar[, 1])
 
         ipwm <- ((A == astar) / gg[, gl("g({astar}|w)")])*ipcw_as
         eifm <- ipwm / mean(ipwm) * (vv[, 1] - vvbar[, paste(param, collapse = "")])
+        # eifm <- ipwm  * (vv[, 1] - vvbar[, paste(param, collapse = "")])
 
         eif <- rescale_y(eify + eifz + eifm + vvbar[, paste(param, collapse = "")], bounds$bounds)
         theta <- mean(eif)
 
         thetas <- c(thetas, list(theta))
+        ipws <- c(ipws, list(mean(ipwy * hm / mean(ipwy * hm) * Y)))
         eifs <- c(eifs, list(eif))
     }
 
     names(eifs) <- c("11", "10", "00")
     names(thetas) <- c("11", "10", "00")
+    names(ipws) <- c("11", "10", "00")
 
     ans <- data.frame(indirect = thetas$`11` - thetas$`10`,
                       direct = thetas$`10` - thetas$`00`,
                       gcomp_indirect = mean(vvbar[, "11"] - vvbar[, "10"]),
-                      gcomp_direct = mean(vvbar[, "10"] - vvbar[, "00"]))
+                      gcomp_direct = mean(vvbar[, "10"] - vvbar[, "00"]), 
+                      ipw_indirect = ipws$`11` - ipws$`10`, 
+                      ipw_direct = ipws$`10` - ipws$`00`)
 
     ans$var_indirect <- var(eifs$`11` - eifs$`10`)
     ans$var_direct <- var(eifs$`10` - eifs$`00`)

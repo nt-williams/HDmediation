@@ -35,7 +35,7 @@ pz2 <- function(a, w) {
 
 dz2 <- function(z2, a, w) {
     probs <- pz2(a, w)
-    purrr::map2_dbl(seq_along(a), z2, \(i, j) probs[i, j])
+    purrr::map2_dbl(seq_along(a), z2, function(i, j) probs[i, j])
 }
 
 rz2 <- function(a, w) {
@@ -63,7 +63,7 @@ pz3 <- function(a, w) {
 
 dz3 <- function(z3, a, w) {
     probs <- pz3(a, w)
-    purrr::map2_dbl(seq_along(a), z3, \(i, j) probs[i, j])
+    purrr::map2_dbl(seq_along(a), z3, function(i, j) probs[i, j])
 }
 
 rz3 <- function(a, w) {
@@ -72,13 +72,13 @@ rz3 <- function(a, w) {
 
 # continuous Z, bounded [0, 1] (beta distributed)
 dz4 <- function(z4, a, w) {
-    shape1 <- 0.25 + 0.75*a + w
-    dbeta(z4, shape1, 5)
+    shape1 <- 1.9 + 0.075*a + 0.02*w
+    dbeta(z4, shape1, 2)
 }
 
 rz4 <- function(a, w) {
-    shape1 <- 0.25 + 0.75*a + w
-    rbeta(length(a), shape1, 5)
+    shape1 <- 1.9 + 0.075*a + 0.02*w
+    rbeta(length(a), shape1, 2)
 }
 
 # Joint distribution of all Z
@@ -87,25 +87,45 @@ dz <- function(z1, z2, z3, z4, a, w) {
 }
 
 # continuous M, bounded [0, 1] (beta distributed)
+# dm1 <- function(m1, z1, z2, z3, z4, a, w) {
+#     shape1 <- 2 + 0.01*z1 + 0.03*z2 - 0.02*z3 + 0.5*a + 0.03*w
+#     dbeta(m1, shape1, 2)
+# }
+
 dm1 <- function(m1, z1, z2, z3, z4, a, w) {
-    shape1 <- 2 + 0.1*z1 + 0.3*z2 - 0.2*z3 + 0.5*a + 0.3*w
-    dbeta(m1, shape1, 5)
+    mu <- 1 + 0.01*z1 + 0.03*z2 - 0.02*z3 + 0.5*a + 0.03*w
+    dnorm(m1, mu)
 }
 
+# rm1 <- function(z1, z2, z3, z4, a, w) {
+#     shape1 <- 2 + 0.01*z1 + 0.03*z2 - 0.02*z3 + 0.5*a + 0.03*w
+#     rbeta(length(a), shape1, 2)
+# }
+
 rm1 <- function(z1, z2, z3, z4, a, w) {
-    shape1 <- 2 + 0.1*z1 + 0.3*z2 - 0.2*z3 + 0.5*a + 0.3*w
-    rbeta(length(a), shape1, 5)
+    mu <- 1 + 0.01*z1 + 0.03*z2 - 0.02*z3 + 0.5*a + 0.03*w
+    rnorm(length(a), mu)
 }
 
 # continuous M, bounded [0, 1] (beta distributed)
+# dm2 <- function(m2, z1, z2, z3, z4, a, w) {
+#     shape1 <- 1.5 + 0.04*z2 + 0.03*z4 + .75*a + 0.025*w
+#     dbeta(m2, shape1, 2)
+# }
+
 dm2 <- function(m2, z1, z2, z3, z4, a, w) {
-    shape1 <- 0.2 + 0.7*z2 + 0.3*z4 + a*w
-    dbeta(m2, shape1, 5)
+    mu <- 1 + 0.04*z2 + 0.03*z4 + .75*a + 0.025*w
+    dnorm(m2, mu)
 }
 
+# rm2 <- function(z1, z2, z3, z4, a, w) {
+#     shape1 <- 1.5 + 0.04*z2 + 0.03*z4 + .75*a + 0.025*w
+#     rbeta(length(a), shape1, 2)
+# }
+
 rm2 <- function(z1, z2, z3, z4, a, w) {
-    shape1 <- 0.2 + 0.7*z2 + 0.3*z4 + a*w
-    rbeta(length(a), shape1, 5)
+    mu <- 1 + 0.04*z2 + 0.03*z4 + .75*a + 0.025*w
+    rnorm(length(a), mu)
 }
 
 # Joint distribution of all M
@@ -119,27 +139,27 @@ dm_noz1 <- function(m1, m2, z2, z3, z4, a, w) {
 }
 
 dm_noz1z2 <- function(m1, m2, z3, z4, a, w) {
-    ans <- vector("numeric", length(a))
-    for (z in 1:5) {
-        ans <- ans + dm_noz1(m1, m2, z2 = z, z3, z4, a, w)*dz2(z, a, w)
-    }
-    ans
+    dm_noz1(m1, m2, z2 = 1, z3, z4, a, w)*dz2(1, a, w) + 
+        dm_noz1(m1, m2, z2 = 2, z3, z4, a, w)*dz2(2, a, w) + 
+        dm_noz1(m1, m2, z2 = 3, z3, z4, a, w)*dz2(3, a, w) + 
+        dm_noz1(m1, m2, z2 = 4, z3, z4, a, w)*dz2(4, a, w) + 
+        dm_noz1(m1, m2, z2 = 5, z3, z4, a, w)*dz2(5, a, w)
 }
 
 dm_noz1z2z3 <- function(m1, m2, z4, a, w) {
-    ans <- vector("numeric", length(a))
-    for (z in 1:5) {
-        ans <- ans + dm_noz1z2(m1, m2, z3 = z, z4, a, w)*dz3(z, a, w)
-    }
-    ans
+    dm_noz1z2(m1, m2, z3 = 1, z4, a, w)*dz3(1, a, w) +
+        dm_noz1z2(m1, m2, z3 = 2, z4, a, w)*dz3(2, a, w) + 
+        dm_noz1z2(m1, m2, z3 = 3, z4, a, w)*dz3(3, a, w) + 
+        dm_noz1z2(m1, m2, z3 = 4, z4, a, w)*dz3(4, a, w) + 
+        dm_noz1z2(m1, m2, z3 = 5, z4, a, w)*dz3(5, a, w)
 }
 
 dmaw <- function(m1, m2, a, w) {
-    integrate(\(z) dm_noz1z2z3(m1, m2, z4 = z, a, w), 0, 1)$value
+    integrate(function(z) dm_noz1z2z3(m1, m2, z4 = z, a, w), 0, 1)$value
 }
 
 my <- function(m1, m2, z1, z2, z3, z4, a, w) {
-    plogis(-log(5) + log(8)*z2 + log(6)*m1 + log(4)*m2 - log(1.2)*w - .25*z1 - log(2)*z3 + log(3)*w*z4)
+    plogis(-6 + log(5)*a + log(8)*z2 + log(6)*m1 + log(4)*m2 - log(1.2)*w + .25*z1 + log(2)*z3 + log(3)*w + z4)
 }
 
 sample_data <- function(n) {

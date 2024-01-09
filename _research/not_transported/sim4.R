@@ -16,19 +16,22 @@ tmle <- T
 id <- Sys.getenv("SGE_TASK_ID")
 if (id == "undefined" || id == "") id <- 1
 
-folds <- 5
-
-learners <- list("mean", "glm", 
+learners <- list("mean", "glm",
                  list("earth", degree = 3, fast.k = 0, fast.beta = 0, id = "earth"),
                  list("lightgbm", min_data_in_leaf = 5),
                  list("ranger", num.trees = 500, id = "ranger1"),
-                 list("ranger", num.trees = 1000, id = "ranger2"))
+                 list("ranger", num.trees = 1000, id = "ranger2"), 
+                 list("nnet", trace = FALSE, decay = 0.05), 
+                 list("nnet", trace = FALSE, decay = 0.1), 
+                 list("nnet", trace = FALSE, decay = 0.01))
 
 res <- map_dfr(c(500, 1000, 5000, 1e4), function(n) {
     dat <- sample_data(n)
 
     z <- names(dat)[startsWith(names(dat), "z")]
     m <- names(dat)[startsWith(names(dat), "m")]
+    
+    folds <- ifelse(n > 5000, 2, 5)
 
     mediation(dat, "a", "w", "z", "m", "y",
               family = "binomial",

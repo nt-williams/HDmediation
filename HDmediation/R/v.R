@@ -10,13 +10,20 @@ v <- function(data, npsem, bb, hz, aprime, folds, learners, ...) {
         valid[[npsem$A]] <- aprime
         try(valid[[npsem$S]] <- 0, silent = TRUE)
 
-        v[folds[[fold]]$validation_set, "v(m,w)"] <-
-            crossfit(train[, c("tmp_HDmediation_outcome_v_fit",
-                               npsem$M, npsem$A, npsem$W, npsem$S)],
-                     list(valid),
-                     "tmp_HDmediation_outcome_v_fit",
-                     "continuous",
-                     learners = learners)[[1]]
+        # v[folds[[fold]]$validation_set, "v(m,w)"] <-
+        #     crossfit(train[, c("tmp_HDmediation_outcome_v_fit",
+        #                        npsem$M, npsem$A, npsem$W, npsem$S)],
+        #              list(valid),
+        #              "tmp_HDmediation_outcome_v_fit",
+        #              "continuous",
+        #              learners = learners)[[1]]
+        
+        fit <- hal9001::fit_hal(X = as.matrix(train[, c(npsem$M, npsem$A, npsem$W, npsem$S)]), 
+                                Y = train[["tmp_HDmediation_outcome_v_fit"]], 
+                                max_degree = 1, 
+                                family = "gaussian")
+        v[folds[[fold]]$validation_set, "v(m,w)"] <- 
+            predict(fit, valid[, c(npsem$M, npsem$A, npsem$W, npsem$S)])
     }
     v
 }
@@ -33,13 +40,20 @@ vbar <- function(data, npsem, vv, astar, folds, learners, ...) {
         valid[[npsem$A]] <- astar
         try(valid[[npsem$S]] <- 0, silent = TRUE)
 
-        vbar[folds[[v]]$validation_set, "vbar(w)"] <-
-            crossfit(train[, c("tmp_HDmediation_outcome_v_fit",
-                               npsem$A, npsem$W, npsem$S)],
-                     list(valid),
-                     "tmp_HDmediation_outcome_v_fit",
-                     "continuous",
-                     learners = learners)[[1]]
+        # vbar[folds[[v]]$validation_set, "vbar(w)"] <-
+        #     crossfit(train[, c("tmp_HDmediation_outcome_v_fit",
+        #                        npsem$A, npsem$W, npsem$S)],
+        #              list(valid),
+        #              "tmp_HDmediation_outcome_v_fit",
+        #              "continuous",
+        #              learners = learners)[[1]]
+        
+        fit <- hal9001::fit_hal(X = as.matrix(train[, c(npsem$A, npsem$W, npsem$S)]), 
+                                Y = train[["tmp_HDmediation_outcome_v_fit"]], 
+                                max_degree = 1, 
+                                family = "gaussian")
+        vbar[folds[[v]]$validation_set, "vbar(w)"] <- 
+            predict(fit, valid[, c(npsem$A, npsem$W, npsem$S)])
     }
     vbar
 }

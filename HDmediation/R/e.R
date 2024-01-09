@@ -6,7 +6,7 @@ e <- function(data, npsem, folds, learners) {
         train <- origami::training(data, folds[[v]])
         valid <- origami::validation(data, folds[[v]])
         try(valid[[npsem$S]] <- 0, silent = TRUE)
-
+# browser()
         preds <- crossfit(train[, c(npsem$A, npsem$M, npsem$W, npsem$S)],
                           list(valid),
                           npsem$A,
