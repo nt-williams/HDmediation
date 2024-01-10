@@ -11,52 +11,52 @@ h_z <- function(data, npsem, folds, learners, ...) {
         valid_0$tmp_tmce_id <- valid_1$tmp_tmce_id <- 1:nrow(valid_1)
         # browser()
         
-        p_zmw <- list()
-        fit_zmw <- hal9001::fit_hal(X = as.matrix(train[, c(npsem$Z, npsem$W, npsem$A, npsem$S)]), 
-                         Y = train[["tmp_tmce_delta"]], 
-                         X_unpenalized = as.matrix(train[, npsem$M]), 
-                         max_degree = 2, 
-                         family = "binomial", 
-                         id = train[["tmp_tmce_id"]])
-        p_zmw[[1]] <- predict(fit_zmw, 
-                              valid_0[, c(npsem$Z, npsem$W, npsem$A, npsem$S)],
-                              as.matrix(valid_0[, npsem$M]))
-        p_zmw[[2]] <- predict(fit_zmw, 
-                              valid_1[, c(npsem$Z, npsem$W, npsem$A, npsem$S)],
-                              as.matrix(valid_1[, npsem$M]))
-        
-        
-        p_mw <- list()
-        fit_mw <- hal9001::fit_hal(X = as.matrix(train[, c(npsem$W, npsem$A, npsem$S)]), 
-                         Y = train[["tmp_tmce_delta"]], 
-                         X_unpenalized = as.matrix(train[, npsem$M]), 
-                         max_degree = 2, 
-                         family = "binomial", 
-                         id = train[["tmp_tmce_id"]])
-        p_mw[[1]] <- predict(fit_mw, 
-                              valid_0[, c(npsem$W, npsem$A, npsem$S)],
-                              as.matrix(valid_0[, npsem$M]))
-        p_mw[[2]] <- predict(fit_mw, 
-                              valid_1[, c(npsem$W, npsem$A, npsem$S)],
-                              as.matrix(valid_1[, npsem$M]))
-
-        # p_zmw <- crossfit(train[, c("tmp_tmce_delta", "tmp_tmce_id",
-        #                             npsem$Z, npsem$M, npsem$W, npsem$A, npsem$S)],
-        #                   list(valid_0, valid_1),
-        #                   "tmp_tmce_delta",
-        #                   "binomial",
-        #                   id = "tmp_tmce_id",
-        #                   learners = learners,
-        #                   bound = T)
+        # p_zmw <- list()
+        # fit_zmw <- hal9001::fit_hal(X = as.matrix(train[, c(npsem$Z, npsem$W, npsem$A, npsem$S)]),
+        #                  Y = train[["tmp_tmce_delta"]],
+        #                  X_unpenalized = as.matrix(train[, npsem$M]),
+        #                  max_degree = 2,
+        #                  family = "binomial",
+        #                  id = train[["tmp_tmce_id"]])
+        # p_zmw[[1]] <- predict(fit_zmw,
+        #                       valid_0[, c(npsem$Z, npsem$W, npsem$A, npsem$S)],
+        #                       as.matrix(valid_0[, npsem$M]))
+        # p_zmw[[2]] <- predict(fit_zmw,
+        #                       valid_1[, c(npsem$Z, npsem$W, npsem$A, npsem$S)],
+        #                       as.matrix(valid_1[, npsem$M]))
         # 
-        # p_mw <- crossfit(train[, c("tmp_tmce_delta", "tmp_tmce_id",
-        #                            npsem$M, npsem$W, npsem$A, npsem$S)],
-        #                  list(valid_0, valid_1),
-        #                  "tmp_tmce_delta",
-        #                  "binomial",
-        #                  id = "tmp_tmce_id",
-        #                  learners = learners,
-        #                  bound = T)
+        # 
+        # p_mw <- list()
+        # fit_mw <- hal9001::fit_hal(X = as.matrix(train[, c(npsem$W, npsem$A, npsem$S)]),
+        #                  Y = train[["tmp_tmce_delta"]],
+        #                  X_unpenalized = as.matrix(train[, npsem$M]),
+        #                  max_degree = 2,
+        #                  family = "binomial",
+        #                  id = train[["tmp_tmce_id"]])
+        # p_mw[[1]] <- predict(fit_mw,
+        #                       valid_0[, c(npsem$W, npsem$A, npsem$S)],
+        #                       as.matrix(valid_0[, npsem$M]))
+        # p_mw[[2]] <- predict(fit_mw,
+        #                       valid_1[, c(npsem$W, npsem$A, npsem$S)],
+        #                       as.matrix(valid_1[, npsem$M]))
+
+        p_zmw <- crossfit(train[, c("tmp_tmce_delta", "tmp_tmce_id",
+                                    npsem$Z, npsem$M, npsem$W, npsem$A, npsem$S)],
+                          list(valid_0, valid_1),
+                          "tmp_tmce_delta",
+                          "binomial",
+                          id = "tmp_tmce_id",
+                          learners = learners,
+                          bound = T)
+
+        p_mw <- crossfit(train[, c("tmp_tmce_delta", "tmp_tmce_id",
+                                   npsem$M, npsem$W, npsem$A, npsem$S)],
+                         list(valid_0, valid_1),
+                         "tmp_tmce_delta",
+                         "binomial",
+                         id = "tmp_tmce_id",
+                         learners = learners,
+                         bound = T)
         
         num <- (nrow(data) / (nrow(data)*5))*(p_zmw[[1]] / (1 - p_zmw[[1]])) 
         denom <- (nrow(data) / (nrow(data)*5))*(p_mw[[1]] / (1 - p_mw[[1]]))
@@ -65,8 +65,8 @@ h_z <- function(data, npsem, folds, learners, ...) {
             # (p_zmw[[1]] / (1 - p_zmw[[1]])) * ((1 - p_mw[[1]]) / p_mw[[1]])
         
         
-        num <- (nrow(data) / (nrow(data)*10))*(p_zmw[[2]] / (1 - p_zmw[[2]])) 
-        denom <- (nrow(data) / (nrow(data)*10))*(p_mw[[2]] / (1 - p_mw[[2]]))
+        num <- (nrow(data) / (nrow(data)*5))*(p_zmw[[2]] / (1 - p_zmw[[2]])) 
+        denom <- (nrow(data) / (nrow(data)*5))*(p_mw[[2]] / (1 - p_mw[[2]]))
 
         h_z[folds[[v]]$validation_set, "h_z(1)"] <- num / denom
             # (p_zmw[[2]] / (1 - p_zmw[[2]])) * ((1 - p_mw[[2]]) / p_mw[[2]])

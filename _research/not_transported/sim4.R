@@ -37,15 +37,15 @@ res <- map_dfr(c(500, 1000, 5000, 1e4), function(n) {
               family = "binomial",
               folds = folds,
               partial_tmle = tmle,
-              learners_g = "glm",
+              learners_g = "mean",
               learners_c = learners,
               learners_b = learners,
               learners_e = learners,
-              learners_hz = learners,
-              learners_u = learners,
-              learners_ubar = learners,
-              learners_v = learners,
-              learners_vbar = learners)
+              learners_hz = "npreg",
+              learners_u = "npreg",
+              learners_ubar = "npreg",
+              learners_v = "npreg",
+              learners_vbar = "npreg")
 }, .id = "n")
 
 res <- mutate(res, n = case_when(
