@@ -20,7 +20,6 @@ not_transported <- function(data, A, W, Z, M, Y, cens,
     gg <- g(data, npsem, folds, learners_g)
     ee <- e(data, npsem, folds, learners_e)
     bb <- b(data, npsem, family, folds, learners_b)
-    # browser()
     hz <- h_z(data, npsem, folds, learners_hz)
 
     if (!is.null(cens)) {
@@ -53,7 +52,7 @@ not_transported <- function(data, A, W, Z, M, Y, cens,
 
         uu <- u(data, npsem, bb, hm, aprime, folds, learners_u)
         uubar <- ubar(data, npsem, uu, aprime, folds, learners_ubar)
-        vv <- v(data, npsem, bb, hz, aprime, folds, learners_v)
+        vv <- v(data, npsem, bb, hz2, aprime, folds, learners_v)
         vvbar[, paste(param, collapse = "")] <- vbar(data, npsem, vv, astar, folds, learners_vbar)
 
         # EIF calculation
