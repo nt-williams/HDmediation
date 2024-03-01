@@ -9,24 +9,32 @@ h_z <- function(data, npsem, folds, learners, ...) {
         valid_1[[npsem$A]] <- 1
         valid_0[[npsem$A]] <- 0
 
-        qz <- crossfit(train[, c(npsem$Z, npsem$W, npsem$A, npsem$S)],
-                       list(valid_0, valid_1),
-                       npsem$Z,
-                       "binomial",
-                       id = NULL,
-                       learners = learners,
-                       bound = T)
-        
-        rz <- crossfit(train[, c(npsem$Z, npsem$M, npsem$W, npsem$A, npsem$S)],
-                       list(valid_0, valid_1),
-                       npsem$Z,
-                       "binomial",
-                       id = NULL,
-                       learners = learners,
-                       bound = T)
-        
-        z <- valid_1[[npsem$Z]]
-        
+        if (is.null(npsem$Z)) {
+            qz <- list(rep(1, nrow(valid_1)), 
+                       rep(1, nrow(valid_1)))
+            rz <- list(rep(1, nrow(valid_1)), 
+                       rep(1, nrow(valid_1)))
+            z <- rep(1, nrow(valid_1))
+        } else {
+            qz <- crossfit(train[, c(npsem$Z, npsem$W, npsem$A, npsem$S)],
+                           list(valid_0, valid_1),
+                           npsem$Z,
+                           "binomial",
+                           id = NULL,
+                           learners = learners,
+                           bound = T)
+            
+            rz <- crossfit(train[, c(npsem$Z, npsem$M, npsem$W, npsem$A, npsem$S)],
+                           list(valid_0, valid_1),
+                           npsem$Z,
+                           "binomial",
+                           id = NULL,
+                           learners = learners,
+                           bound = T)
+            
+            z <- valid_1[[npsem$Z]] 
+        }
+
         h_z[folds[[v]]$validation_set, "h_z(0)"] <- 
             (z*qz[[1]] + (1 - z)*(1 - qz[[1]])) / 
             (z*rz[[1]] + (1 - z)*(1 - rz[[1]]))
