@@ -73,9 +73,19 @@ not_transported <- function(data, A, W, Z, M, Y, cens,
         eifs <- c(eifs, list(eif))
     }
     
+    if (!is.null(cens)) {
+        obs <- data[[npsem$cens]]
+        ipcw_a1 <- obs / prob_obs[, "P(delta=1|A=1,Z,M,W)"]
+        ipcw_a0 <- obs / prob_obs[, "P(delta=1|A=0,Z,M,W)"]
+    } else {
+        ipcw_a1 <- ipcw_a0 <- 1
+    }
+    
+    Y <- ifelse(is.na(data[[npsem$Y]]), -999, data[[npsem$Y]])
     mYa <- data[[npsem$A]]*qq[, "Q(1,W)"] + (1 - data[[npsem$A]])*qq[, "Q(0,W)"]
-    H_a <- (data[[npsem$A]] / gg[, "g(1|w)"]) - ((1 - data[[npsem$A]]) / gg[, "g(0|w)"])
-    eif_ate <- (data[[npsem$Y]] - mYa)*H_a + qq[, "Q(1,W)"] - qq[, "Q(0,W)"]
+    H_a <- ((data[[npsem$A]] / gg[, "g(1|w)"])*ipcw_a1) - 
+        (((1 - data[[npsem$A]]) / gg[, "g(0|w)"])*ipcw_a0)
+    eif_ate <- (Y - mYa)*H_a + qq[, "Q(1,W)"] - qq[, "Q(0,W)"]
 
     names(eifs) <- c("11", "10", "00")
     names(thetas) <- c("11", "10", "00")
