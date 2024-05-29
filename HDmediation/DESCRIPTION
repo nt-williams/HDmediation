@@ -30,5 +30,7 @@ Imports:
     schoolmath
 RoxygenNote: 7.2.3
 Depends: 
-    mlr3superlearner (>= 0.1.0), 
+    mlr3superlearner, 
     doFuture
+Remotes: 
+    nt-williams/mlr3superlearner

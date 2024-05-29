@@ -80,19 +80,26 @@ not_transported <- function(data, A, W, Z, M, Y, cens,
     names(thetas) <- c("11", "10", "00")
     names(ipws) <- c("11", "10", "00")
 
-    ans <- data.frame(indirect = thetas$`11` - thetas$`10`,
+    ans <- data.frame(total = thetas$`11` - thetas$`00`,
+                      indirect = thetas$`11` - thetas$`10`,
                       direct = thetas$`10` - thetas$`00`,
                       gcomp_indirect = mean(vvbar[, "11"] - vvbar[, "10"]),
                       gcomp_direct = mean(vvbar[, "10"] - vvbar[, "00"]), 
                       ipw_indirect = ipws$`11` - ipws$`10`, 
                       ipw_direct = ipws$`10` - ipws$`00`)
+    
+    eif_total <- (eifs$`11` - eifs$`00`) - ans$total
 
+    ans$var_total <- var(eif_total)
     ans$var_indirect <- var(eifs$`11` - eifs$`10`)
     ans$var_direct <- var(eifs$`10` - eifs$`00`)
 
+    ci_total <- ans$total + c(-1, 1) * qnorm(0.975) * sqrt(ans$var_total / nrow(data))
     ci_indirect <- ans$indirect + c(-1, 1) * qnorm(0.975) * sqrt(ans$var_indirect / nrow(data))
     ci_direct <- ans$direct + c(-1, 1) * qnorm(0.975) * sqrt(ans$var_direct / nrow(data))
 
+    ans$ci_total_low <- ci_total[1]
+    ans$ci_total_high <- ci_total[2]
     ans$ci_indirect_low <- ci_indirect[1]
     ans$ci_indirect_high <- ci_indirect[2]
     ans$ci_direct_low <- ci_direct[1]
