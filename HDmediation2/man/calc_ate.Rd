@@ -8,6 +8,8 @@ calc_ate(
   data,
   A,
   W,
+  Z,
+  M,
   Y,
   cens = NULL,
   S = NULL,
@@ -30,6 +32,12 @@ A vector containing the column name of the treatment variable. \code{A} must be 
 \item{W}{[\code{character}]\cr
 A vector containing the column names of baseline confounders to be
 included for adjustment.}
+
+\item{Z}{[\code{character}]\cr
+A vector containing the column names of the mediator-outcome confounders.}
+
+\item{M}{[\code{character}]\cr
+A vector containing the column names of the mediators.}
 
 \item{Y}{[\code{character(1)}]\cr
 A vector containing the column name of the outcome variable.}
@@ -56,12 +64,6 @@ The number of folds to be used for cross-fitting.}
 \item{learners_b}{[\code{character}]\cr}
 
 \item{learners_cens}{[\code{character}]\cr}
-
-\item{Z}{[\code{character}]\cr
-A vector containing the column names of the mediator-outcome confounders.}
-
-\item{M}{[\code{character}]\cr
-A vector containing the column names of the mediators.}
 
 \item{learners_e}{[\code{character}]\cr}
 

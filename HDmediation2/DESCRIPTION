@@ -1,4 +1,4 @@
-Package: HDmediationmlr3
+Package: HDmediationh2o
 Type: Package
 Title: Interventional (In)Direct Effects
 Version: 0.1.0.9001
@@ -29,7 +29,7 @@ Imports:
     h2o,
     origami,
     schoolmath
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Depends: 
     mlr3superlearner (>= 0.1.0), 
     doFuture
