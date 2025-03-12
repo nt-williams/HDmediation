@@ -26,7 +26,7 @@ crossfit <- function(train, valid, y, type = c("binomial", "continuous"), id = N
         y = y,
         training_frame = train,
         fold_column = "tmp_cv_folds",
-        max_models = 10,
+        max_models = 5,
         balance_classes = match.arg(type) == "binomial",
         sort_metric = ifelse(match.arg(type) == "binomial", "logloss", "MSE"),
         distribution = ifelse(match.arg(type) == "binomial", "bernoulli", "gaussian"),
